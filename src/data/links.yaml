@@ -1,0 +1,271 @@
+navigation:
+  - category: 企业系统
+    links:
+      - name: 企业官网
+        url: https://www.elexvx.com/
+        description: 企业官网
+        icon: /images/logos/elexvx.png
+        tags:
+          - 官网
+        status: available
+      - name: 项目管理系统
+        url: https://it.elexvx.com
+        description: 项目管理系统
+        icon: /images/logos/elexvx.png
+        tags:
+          - 官网
+        status: available
+      - name: ElexvxAI Lab
+        url: https://ai.elexvx.com/
+        description: 研发中心
+        icon: /images/logos/elexvx.png
+        tags:
+          - 科研
+          - 研发
+        status: available
+      - name: 题库服务
+        url: https://www.kaoshixing.com/login/account/login
+        description: 南京保安员考试题库
+        icon: /images/logos/kaoshixing.png
+        tags:
+          - 题库
+          - 考试
+        status: available
+  - category: 政务链接
+    links:
+      - name: 工业和信息化部政务服务平台
+        url: https://zjtx.miit.gov.cn/zxqySy/main
+        description: 优质中小企业梯度培育平台
+        icon: /images/logos/guohui.png
+        tags:
+          - 档案
+          - 查询
+        status: available
+      - name: 江苏政务服务
+        url: https://www.jszwfw.gov.cn/
+        description: 江苏通办大厅
+        icon: /images/logos/jszwfw.png
+        tags:
+          - 政务
+        status: available
+      - name: 江苏人社网办大厅
+        url: https://rs.jshrss.jiangsu.gov.cn/web/login
+        description: 社保办理
+        icon: /images/logos/jshrss.png
+        tags:
+          - 社保
+          - 人社
+        status: available
+      - name: 医保公共服务
+        url: https://ybj.jszwfw.gov.cn/hsa-local/web/hallEnter/#/unitLogin
+        description: 医保办理
+        icon: /images/logos/chs.png
+        tags:
+          - 医保
+          - 保险
+        status: available
+      - name: 全国统一规范电子税务局
+        url: https://etax.jiangsu.chinatax.gov.cn:8443/
+        description: 江苏税务系统
+        icon: /images/logos/jssw.png
+        tags:
+          - 税务
+          - 电子税务
+        status: available
+      - name: 国家企业信用公示系统
+        url: https://scjg.jszwfw.gov.cn/province/loginReport.jsp
+        description: 江苏税务系统
+        icon: /images/logos/guohui.png
+        tags:
+          - 信用
+          - 公示
+        status: available
+      - name: 智慧团建
+        url: https://zhtj.youth.cn/zhtj/mine/home
+        description: 智慧团建
+        icon: /images/logos/zggqt.png
+        tags:
+          - 团建
+          - 共青团
+        status: available
+      - name: 建邺区档案查询
+        url: http://180.101.237.57:18080/njjy/Account/Login
+        description: 建邺区企业登记档案网上查询系统
+        icon: /images/logos/guohui.png
+        tags:
+          - 档案
+          - 查询
+        status: available
+  - category: 知识产权
+    links:
+      - name: 专利业务办理系统
+        url: https://cponline.cnipa.gov.cn/
+        description: 专利申请
+        icon: /images/logos/cnipa-2.png
+        tags:
+          - 专利
+          - 申请
+        status: available
+      - name: 专利审查状态查询
+        url: https://cpquery.cponline.cnipa.gov.cn/chinesepatent/index
+        description: 状态查询
+        icon: /images/logos/cnipa-2.png
+        tags:
+          - 专利
+          - 申请
+        status: available
+      - name: 中国商标网
+        url: https://sso.cnipa.gov.cn/am/#/login
+        description: 商标注册申请
+        icon: /images/logos/cnipa.png
+        tags:
+          - 商标
+          - 注册
+        status: available
+      - name: 中国版权中心
+        url: https://register.ccopyright.com.cn/login.html
+        description: 软件著作权申请
+        icon: /images/logos/ccopyright.png
+        tags:
+          - 版权
+          - 软件著作权
+        status: available
+      - name: 江苏省作品著作权登记系统
+        url: https://jscopyright.cn/jsuser/user/login
+        description: 作品著作权登记系统
+        icon: /images/logos/jscopyright.png
+        tags:
+          - 著作权
+          - 作品登记
+        status: available
+  - category: 企业信用
+    links:
+      - name: 信用中国
+        url: https://www.creditchina.gov.cn/
+        description: 信用中国
+        icon: /images/logos/guohui.png
+        tags:
+          - 信用
+          - 政府
+        status: available
+      - name: 爱企查-宏翔商道-科技
+        url: https://aiqicha.baidu.com/company_detail_56215758055636
+        description: 爱企查
+        icon: /images/logos/aiqicha.png
+        tags:
+          - 企业查询
+          - 科技公司
+        status: available
+      - name: 爱企查-林汐智觉
+        url: https://aiqicha.baidu.com/company_detail_63903449782455
+        description: 爱企查
+        icon: /images/logos/aiqicha.png
+        tags:
+          - 企业查询
+          - 林汐智觉
+        status: available
+      - name: 爱企查-方升允济
+        url: https://aiqicha.baidu.com/company_detail_63793913715120
+        description: 爱企查
+        icon: /images/logos/aiqicha.png
+        tags:
+          - 企业查询
+          - 方升允济
+        status: available
+      - name: 爱企查-桐谷霁屿
+        url: https://aiqicha.baidu.com/company_detail_62570278677073
+        description: 爱企查
+        icon: /images/logos/aiqicha.png
+        tags:
+          - 企业查询
+          - 科技公司
+        status: available
+      - name: 爱企查-宏翔商道-劳务
+        url: https://aiqicha.baidu.com/company_detail_56910435771118
+        description: 爱企查
+        icon: /images/logos/aiqicha.png
+        tags:
+          - 企业查询
+          - 劳务公司
+        status: available
+      - name: 企查查-科技
+        url: https://www.qcc.com/firm/2edfb36b4a31a1194203251df76a2371.html
+        description: 企查查
+        icon: /images/logos/qcc.png
+        tags:
+          - 企业查询
+          - 科技公司
+        status: available
+      - name: 企查查-劳务
+        url: https://www.qcc.com/firm/b3acea446c38e162b6679a7c6df4c316.html
+        description: 企查查
+        icon: /images/logos/qcc.png
+        tags:
+          - 企业查询
+          - 劳务公司
+      - name: 企查查-林汐智觉
+        url: https://www.qcc.com/firm/cf32a80cda71ce49879501a1c04cf4cf.html
+        description: 企查查
+        icon: /images/logos/qcc.png
+        tags:
+          - 企业查询
+          - 林汐智觉
+  - category: 人工智能
+    links:
+      - name: OpenAI官网
+        url: https://openai.com/zh-Hans-CN/
+        description: OpenAI官方网站
+        icon: /images/logos/chatgpt.png
+        tags:
+          - AI
+          - ChatGPT
+        status: available
+      - name: ChatGPT
+        url: https://chatgpt.com/
+        description: ChatGPT对话平台
+        icon: /images/logos/chatgpt.png
+        tags:
+          - AI
+          - 对话
+        status: available
+      - name: Gemini
+        url: https://gemini.google.com/
+        description: Google Gemini AI助手
+        icon: /images/logos/gemini.png
+        tags:
+          - AI
+          - Google
+        status: available
+      - name: Google AI Studio
+        url: https://aistudio.google.com/prompts/new_chat
+        description: Google AI Studio
+        icon: /images/logos/gemini.png
+        tags:
+          - AI
+          - Google
+        status: available
+  - category: 公众平台
+    links:
+      - name: 微信公众服务
+        url: https://mp.weixin.qq.com/
+        description: 微信公众平台
+        icon: /images/logos/weixin.png
+        tags:
+          - 微信
+          - 公众号
+        status: available
+      - name: 135编辑器
+        url: https://www.135editor.com/
+        description: 135编辑器
+        icon: /images/logos/135.png
+        tags:
+          - 编辑器
+          - 排版
+        status: available
+      - name: 无货源发货
+        url: https://dzmdzhq.lijieblog.cn/#/
+        description: 单号宝--电子面单转换器--支持全平台
+        icon: /images/logos/lijie.jpg
+        tags:
+          - 单号转换
+        status: available

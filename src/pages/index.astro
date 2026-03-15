@@ -1,6 +1,8 @@
----
+﻿---
 import Layout from '../layouts/Layout.astro';
-import { navigation, type NavigationCategory } from '../config/links';
+import { getNavigation } from '../config/contentService';
+
+const navigation = await getNavigation();
 
 const iconMap: Record<string, string> = {
   check: '<path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" />',
@@ -13,13 +15,13 @@ const iconMap: Record<string, string> = {
 const statusConfig: Record<string, { text: string; color: string; iconName: string }> = {
   available: { text: '可用', color: 'text-green-600', iconName: 'check' },
   maintenance: { text: '维护中', color: 'text-orange-600', iconName: 'tool' },
-  unavailable: { text: '不可访问', color: 'text-red-600', iconName: 'x' },
+  unavailable: { text: '不可用', color: 'text-red-600', iconName: 'x' },
   beta: { text: '测试版', color: 'text-blue-600', iconName: 'star' },
-  deprecated: { text: '已弃用', color: 'text-gray-500', iconName: 'alert-triangle' }
+  deprecated: { text: '已停用', color: 'text-gray-500', iconName: 'alert-triangle' }
 };
 
-// 获取所有链接的总数
-function getTotalLinks(categories: NavigationCategory[]): number {
+// 获取所有链接总数
+function getTotalLinks(categories: any[]): number {
   return categories.reduce((total, category) => {
     if (category.subcategories) {
       return total + category.subcategories.reduce((subTotal, sub) => subTotal + sub.links.length, 0);
@@ -28,8 +30,8 @@ function getTotalLinks(categories: NavigationCategory[]): number {
   }, 0);
 }
 
-// 获取所有分类数（包括二级分类）
-function getTotalCategories(categories: NavigationCategory[]): number {
+// 获取所有分类数量（包含二级分类）
+function getTotalCategories(categories: any[]): number {
   return categories.reduce((total, category) => {
     if (category.subcategories) {
       return total + category.subcategories.length;
@@ -37,34 +39,35 @@ function getTotalCategories(categories: NavigationCategory[]): number {
     return total + 1;
   }, 0);
 }
+
+function toWebp(icon?: string): string | undefined {
+  if (!icon) return icon;
+  return icon.endsWith('.png') ? icon.replace(/\.png$/i, '.webp') : icon;
+}
 ---
 
 <Layout 
   title="快速访问"
-  description="专业的企业级工具和资源导航平台，提供开发工具、设计资源、云服务等分类导航，快速访问常用工具和资源"
+  description="专业的企业级工具和资源导航平台，提供开发工具、设计资源和常用服务入口。"
   keywords={['企业导航', '工具导航', '快速访问', '开发工具', '设计资源']}
 >
   <style>
     /* 页面动画效果 */
     @keyframes fadeInUp {
       from {
-        opacity: 0;
-        transform: translateY(30px);
+transform: translateY(12px);
       }
       to {
-        opacity: 1;
-        transform: translateY(0);
+transform: translateY(0);
       }
     }
     
     @keyframes fadeInLeft {
       from {
-        opacity: 0;
-        transform: translateX(-30px);
+transform: translateX(-12px);
       }
       to {
-        opacity: 1;
-        transform: translateX(0);
+transform: translateX(0);
       }
     }
     
@@ -86,13 +89,15 @@ function getTotalCategories(categories: NavigationCategory[]): number {
       }
     }
     
-    /* 应用动画类 */
+    /* 动画工具类 */
     .animate-fade-in-up {
-      animation: fadeInUp 0.6s ease-out;
+      animation: fadeInUp 0.35s ease-out;
+      will-change: transform;
     }
     
     .animate-fade-in-left {
-      animation: fadeInLeft 0.6s ease-out;
+      animation: fadeInLeft 0.35s ease-out;
+      will-change: transform;
     }
     
     .animate-pulse-gentle {
@@ -117,7 +122,7 @@ function getTotalCategories(categories: NavigationCategory[]): number {
     .delay-400 { animation-delay: 0.4s; }
     .delay-500 { animation-delay: 0.5s; }
     
-    /* 卡片悬停效果增强 */
+    /* 增强卡片悬停效果 */
     .card-hover {
       position: relative;
       overflow: hidden;
@@ -142,6 +147,15 @@ function getTotalCategories(categories: NavigationCategory[]): number {
     .card-hover:hover::before {
       left: 100%;
     }
+  
+    @media (prefers-reduced-motion: reduce) {
+      .animate-fade-in-up,
+      .animate-fade-in-left,
+      .animate-pulse-gentle,
+      .shimmer-effect {
+        animation: none !important;
+      }
+    }
   </style>
   <div class="p-8 animate-fade-in-up">
     <!-- 链接卡片网格 -->
@@ -154,7 +168,7 @@ function getTotalCategories(categories: NavigationCategory[]): number {
           </h2>
           
           {group.subcategories ? (
-            <!-- 有二级分类的情况 -->
+            <!-- 包含二级分类 -->
             <div class="space-y-6">
               {group.subcategories.map(subcategory => (
                 <div>
@@ -172,12 +186,18 @@ function getTotalCategories(categories: NavigationCategory[]): number {
                           <div class="flex-shrink-0">
                             {link.icon ? (
                               <div class="w-12 h-12 rounded-xl overflow-hidden bg-white border border-gray-200 group-hover:border-blue-300 transition-all duration-300 hover:scale-105">
-                                <img 
-                                   src={link.icon} 
-                                   alt={`${link.name} logo`}
-                                   class="w-full h-full object-cover"
-                                   loading="lazy"
-                                 />
+                                <picture>
+                                  <source srcset={toWebp(link.icon)} type="image/webp" />
+                                  <img 
+                                     src={link.icon} 
+                                     alt={`${link.name} logo`}
+                                     class="w-full h-full object-cover"
+                                     loading="lazy"
+                                     width="48"
+                                     height="48"
+                                     decoding="async"
+                                   />
+                                </picture>
                               </div>
                             ) : (
                               <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-300">
@@ -200,7 +220,7 @@ function getTotalCategories(categories: NavigationCategory[]): number {
                               </svg>
                             </div>
                             
-                            <!-- 标签或状态指示 -->
+                            <!-- 标签或状态 -->
                             <div class="mt-3 flex items-center justify-between">
                               <div class="flex flex-wrap gap-1">
                                 {link.tags && link.tags.length > 0 ? (
@@ -236,7 +256,7 @@ function getTotalCategories(categories: NavigationCategory[]): number {
               ))}
             </div>
           ) : (
-            <!-- 没有二级分类的情况 -->
+            <!-- 不包含二级分类 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
               {group.links?.map(link => (
                 <a
@@ -250,12 +270,18 @@ function getTotalCategories(categories: NavigationCategory[]): number {
                     <div class="flex-shrink-0">
                       {link.icon ? (
                         <div class="w-12 h-12 rounded-xl overflow-hidden bg-white border border-gray-200 group-hover:border-green-300 transition-all duration-300 hover:scale-105">
-                          <img 
-                             src={link.icon} 
-                             alt={`${link.name} logo`}
-                             class="w-full h-full object-cover"
-                             loading="lazy"
-                           />
+                          <picture>
+                                  <source srcset={toWebp(link.icon)} type="image/webp" />
+                                  <img 
+                                     src={link.icon} 
+                                     alt={`${link.name} logo`}
+                                     class="w-full h-full object-cover"
+                                     loading="lazy"
+                                     width="48"
+                                     height="48"
+                                     decoding="async"
+                                   />
+                                </picture>
                         </div>
                       ) : (
                         <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center group-hover:from-green-600 group-hover:to-green-700 transition-all duration-300">
@@ -278,7 +304,7 @@ function getTotalCategories(categories: NavigationCategory[]): number {
                         </svg>
                       </div>
                       
-                      <!-- 标签或状态指示 -->
+                      <!-- 标签或状态 -->
                       <div class="mt-3 flex items-center justify-between">
                         <div class="flex flex-wrap gap-1">
                           {link.tags && link.tags.length > 0 ? (
@@ -340,4 +366,5 @@ function getTotalCategories(categories: NavigationCategory[]): number {
       </div>
     </div>
   </div>
+
 </Layout>

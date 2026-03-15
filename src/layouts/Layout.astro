@@ -4,7 +4,15 @@ import Sidebar from '../components/Sidebar.astro';
 import SEOHead from '../components/SEOHead.astro';
 import SearchBox from '../components/SearchBox.astro';
 import '../styles/global.css';
-import type { PageSEO } from '../config/seo';
+
+interface PageSEO {
+	title?: string;
+	description?: string;
+	keywords?: string[];
+	image?: string;
+	noindex?: boolean;
+	canonical?: string;
+}
 
 export interface Props extends PageSEO {
 	title?: string;

@@ -1,10 +1,12 @@
 ---
-import { searchEngines, searchConfig, getSearchEngine } from '../config/search';
+import { getSearchData, getSearchEngine } from '../config/contentService';
+
+const { searchEngines, searchConfig } = await getSearchData();
 
 const enabledEngines = searchEngines.filter(engine =>
   searchConfig.enabledEngines.includes(engine.name)
 );
-const defaultEngine = getSearchEngine(searchConfig.defaultEngine) || enabledEngines[0];
+const defaultEngine = getSearchEngine(enabledEngines, searchConfig.defaultEngine) || enabledEngines[0];
 const searchEnginesData = Object.fromEntries(
   enabledEngines.map(engine => [engine.name, engine])
 );

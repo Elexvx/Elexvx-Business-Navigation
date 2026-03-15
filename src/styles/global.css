@@ -1,10 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans+Hebrew:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
-
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 /* 全局字体设置 */
-* {
-  font-family: 'Roboto', 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'Noto Sans TC', 'Noto Naskh Arabic', 'Noto Sans Thai', 'Noto Sans Hebrew', 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+html,
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* 平滑滚动 */
@@ -61,7 +60,7 @@ html {
   background: #9ca3af;
 }
 
-/* 日夜模式样式 */
+/* 深色模式样式 */
 #main-content {
   background-color: var(--bg-main);
   color: var(--text-main);
@@ -161,4 +160,6 @@ html {
 #main-content.dark-mode .group-hover\:text-blue-600:hover {
   color: var(--accent);
 }
-/* 添加更多覆盖根据需要 */
+/* 按需补充更多覆盖样式 */
+
+

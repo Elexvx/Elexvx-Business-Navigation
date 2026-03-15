@@ -1,5 +1,14 @@
----
-import { seoConfig, generatePageTitle, generatePageDescription, generateKeywords, generateCanonicalUrl, type PageSEO } from '../config/seo';
+﻿---
+import { getSeoConfig, generatePageTitle, generatePageDescription, generateKeywords, generateCanonicalUrl } from '../config/contentService';
+
+interface PageSEO {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  image?: string;
+  noindex?: boolean;
+  canonical?: string;
+}
 
 export interface Props extends PageSEO {
   title?: string;
@@ -21,11 +30,12 @@ const {
   type = 'website'
 } = Astro.props;
 
-const pageTitle = generatePageTitle(title);
-const pageDescription = generatePageDescription(description);
-const pageKeywords = generateKeywords(keywords);
+const seoConfig = await getSeoConfig();
+const pageTitle = generatePageTitle(seoConfig, title);
+const pageDescription = generatePageDescription(seoConfig, description);
+const pageKeywords = generateKeywords(seoConfig, keywords);
 const pageImage = image || seoConfig.defaultImage;
-const canonicalUrl = canonical || generateCanonicalUrl(Astro.url.pathname);
+const canonicalUrl = canonical || generateCanonicalUrl(seoConfig, Astro.url.pathname);
 const fullImageUrl = pageImage.startsWith('http') ? pageImage : `${seoConfig.siteUrl}${pageImage}`;
 ---
 
@@ -145,10 +155,7 @@ const fullImageUrl = pageImage.startsWith('http') ? pageImage : `${seoConfig.sit
 )}
 
 <!-- 预加载关键资源 -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="dns-prefetch" href="//www.google-analytics.com" />
-<link rel="dns-prefetch" href="//fonts.googleapis.com" />
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

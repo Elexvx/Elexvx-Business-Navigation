@@ -1,5 +1,7 @@
 ---
-import { navigation } from '../config/links';
+import { getNavigation } from '../config/contentService';
+
+const navigation = await getNavigation();
 ---
 
 <aside class="w-64 bg-gray-900 text-white h-screen fixed left-0 top-0 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full flex flex-col" id="sidebar">
@@ -8,11 +10,17 @@ import { navigation } from '../config/links';
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-3 group">
         <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center overflow-hidden">
-          <img 
-            src="/images/logos/elexvx.png" 
-            alt="企业Logo" 
-            class="w-8 h-8 object-contain"
-          />
+          <picture>
+            <source srcset="/images/logos/elexvx.webp" type="image/webp" />
+            <img
+              src="/images/logos/elexvx.png"
+              alt="企业Logo"
+              class="w-8 h-8 object-contain"
+              width="32"
+              height="32"
+              decoding="async"
+            />
+          </picture>
         </div>
         <div class="transition-all duration-300 group-hover:translate-x-1">
           <h1 class="text-xl font-bold transition-colors duration-300 group-hover:text-blue-400">企业外链</h1>
