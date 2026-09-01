@@ -63,4 +63,30 @@ describe('status page', () => {
     expect(await screen.findByText('服务状态受保护')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('访问密码')).toBeInTheDocument();
   });
+
+  it('combines the overall and incident messages into one alert', async () => {
+    const data = createDemoStatusData(60);
+    data.monitors[0].status = 9;
+    data.summary = {
+      ...data.summary,
+      error: 1,
+      ok: data.summary.ok - 1,
+    };
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ code: 200, message: 'success', source: 'demo', data }),
+    }));
+
+    render(
+      <AppProviders>
+        <StatusPage />
+      </AppProviders>,
+    );
+
+    expect(await screen.findByText('部分系统出现异常')).toBeInTheDocument();
+    expect(screen.getByText(/受影响服务：/)).toBeInTheDocument();
+    expect(screen.queryByText('当前存在服务异常')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+  });
 });

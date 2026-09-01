@@ -134,9 +134,10 @@ function GroupLabel({ group }: { group: StatusGroup }) {
   );
 }
 
-function OverallStatus({ data }: { data: StatusData }) {
+function StatusSummary({ data }: { data: StatusData }) {
   const hasErrors = data.summary.error > 0;
   const hasUnknown = data.summary.unknown > 0;
+  const unavailable = data.monitors.filter((monitor) => monitor.status === 8 || monitor.status === 9);
   const type = hasErrors ? 'warning' : hasUnknown ? 'info' : 'success';
   const title = hasErrors
     ? '部分系统出现异常'
@@ -152,26 +153,20 @@ function OverallStatus({ data }: { data: StatusData }) {
   return (
     <Alert
       className={styles.overallStatus}
-      description={`最近更新：${formatStatusTime(data.timestamp)}`}
+      description={(
+        <div className={styles.statusSummaryDetails}>
+          <span>最近更新：{formatStatusTime(data.timestamp)}</span>
+          {unavailable.length > 0 ? (
+            <span>
+              受影响服务：{unavailable.map((monitor) => monitorDisplayName(monitor.name)).join('、')}。系统将持续检测恢复情况。
+            </span>
+          ) : null}
+        </div>
+      )}
       icon={icon}
       title={title}
       showIcon
       type={type}
-    />
-  );
-}
-
-function CurrentIncident({ data }: { data: StatusData }) {
-  const unavailable = data.monitors.filter((monitor) => monitor.status === 8 || monitor.status === 9);
-  if (unavailable.length === 0) return null;
-  return (
-    <Alert
-      className={styles.incidentAlert}
-      description={`受影响服务：${unavailable.map((monitor) => monitorDisplayName(monitor.name)).join('、')}。系统将持续检测恢复情况。`}
-      icon={<WarningFilled />}
-      title="当前存在服务异常"
-      showIcon
-      type="warning"
     />
   );
 }
@@ -332,8 +327,7 @@ export default function StatusPage({ history = false }: StatusPageProps) {
           />
         ) : (
           <>
-            {!history ? <OverallStatus data={data} /> : null}
-            {!history ? <CurrentIncident data={data} /> : null}
+            {!history ? <StatusSummary data={data} /> : null}
             {history ? <StatusHistory data={data} /> : <StatusPanel data={data} />}
             {!history ? (
               <div className={styles.historyAction}>

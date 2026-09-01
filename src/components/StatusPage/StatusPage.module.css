@@ -81,8 +81,7 @@
   padding: 40px 24px 32px;
 }
 
-.overallStatus,
-.incidentAlert {
+.overallStatus {
   margin-bottom: 24px;
   border-radius: 8px;
 }
@@ -97,8 +96,9 @@
   font-size: 28px;
 }
 
-.incidentAlert :global(.ant-alert-message) {
-  font-weight: 600;
+.statusSummaryDetails {
+  display: grid;
+  gap: 6px;
 }
 
 .systemCard,
@@ -371,8 +371,7 @@
     padding: 24px 16px 28px;
   }
 
-  .overallStatus,
-  .incidentAlert {
+  .overallStatus {
     margin-bottom: 18px;
   }
 
