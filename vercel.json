@@ -5,17 +5,34 @@
   "framework": "vite",
   "outputDirectory": "dist",
   "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/status",
+      "has": [{ "type": "host", "value": "status.elexvx.com" }],
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/status/history",
+      "has": [{ "type": "host", "value": "status.elexvx.com" }],
+      "destination": "/history",
+      "permanent": true
+    },
+    {
+      "source": "/history",
+      "has": [{ "type": "host", "value": "nav.elexvx.com" }],
+      "destination": "/status/history",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/",
       "has": [{ "type": "host", "value": "status.elexvx.com" }],
       "destination": "/status"
     },
-    {
-      "source": "/history",
-      "has": [{ "type": "host", "value": "status.elexvx.com" }],
-      "destination": "/status"
-    },
+    { "source": "/history", "destination": "/status" },
     { "source": "/status/history", "destination": "/status" }
   ]
 }

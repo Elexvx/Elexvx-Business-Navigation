@@ -30,6 +30,8 @@ describe('status routing and aggregation', () => {
     expect(resolveAppRoute('status.elexvx.com', '/history')).toBe('status-history');
     expect(resolveAppRoute('nav.elexvx.com', '/status')).toBe('status');
     expect(resolveAppRoute('nav.elexvx.com', '/status/history')).toBe('status-history');
+    expect(resolveAppRoute('nav.elexvx.com', '/history')).toBe('status-history');
+    expect(resolveAppRoute('nav.elexvx.com', '/status/history/')).toBe('status-history');
     expect(resolveAppRoute('nav.elexvx.com', '/')).toBe('navigation');
     expect(statusHomeHref('status.elexvx.com')).toBe('/');
     expect(statusHistoryHref('nav.elexvx.com')).toBe('/status/history');
