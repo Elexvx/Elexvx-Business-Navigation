@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   navigationHomeHref,
@@ -12,7 +12,12 @@ import {
   monitorDisplayName,
   statusTone,
 } from '../src/lib/status';
-import { buildDateRanges, formatUptimeRobotData } from '../server/status/uptimeRobot';
+import {
+  buildDateRanges,
+  fetchStatusData,
+  formatUptimeRobotData,
+  resetStatusCacheForTests,
+} from '../server/status/uptimeRobot';
 import type { StatusMonitor } from '../src/types/status';
 
 function monitor(overrides: Partial<StatusMonitor>): StatusMonitor {
@@ -28,6 +33,13 @@ function monitor(overrides: Partial<StatusMonitor>): StatusMonitor {
     ...overrides,
   };
 }
+
+afterEach(() => {
+  resetStatusCacheForTests();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 describe('status routing and aggregation', () => {
   it('maps the status domain root and navigation subpaths to the status experience', () => {
@@ -79,5 +91,55 @@ describe('status routing and aggregation', () => {
     expect(data.summary).toEqual({ count: 1, ok: 1, error: 0, unknown: 0 });
     expect(data.monitors[0]?.days).toHaveLength(7);
     expect(data.monitors[0]?.days[0]?.date).toBeLessThan(data.monitors[0]?.days[6]?.date ?? 0);
+  });
+
+  it('deduplicates concurrent UptimeRobot requests', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      monitors: [{
+        id: 1,
+        friendly_name: 'A01-企业官网',
+        status: 2,
+        type: 1,
+        interval: 300,
+        custom_uptime_ranges: '100-100',
+      }],
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const first = fetchStatusData({ apiKey: 'test', historyDays: 1 });
+    const second = fetchStatusData({ apiKey: 'test', historyDays: 1 });
+    const [firstResult, secondResult] = await Promise.all([first, second]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(firstResult.source).toBe('api');
+    expect(secondResult.source).toBe('cache');
+  });
+
+  it('returns recently cached data when UptimeRobot is temporarily unavailable', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        monitors: [{
+          id: 1,
+          friendly_name: 'A01-企业官网',
+          status: 2,
+          type: 1,
+          interval: 300,
+          custom_uptime_ranges: '100-100',
+        }],
+      }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      .mockRejectedValueOnce(new Error('upstream timeout'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await fetchStatusData({ apiKey: 'test', historyDays: 1, cacheTtlMs: 0, staleTtlMs: 60_000 });
+    const fallback = await fetchStatusData({
+      apiKey: 'test',
+      historyDays: 1,
+      cacheTtlMs: 0,
+      staleTtlMs: 60_000,
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fallback.source).toBe('cache');
+    expect(fallback.data.monitors[0]?.name).toBe('A01-企业官网');
   });
 });

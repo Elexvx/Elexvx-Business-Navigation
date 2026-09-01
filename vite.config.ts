@@ -4,9 +4,10 @@ import { resolve } from 'node:path';
 
 import { siteConfigPlugin } from './src/config/sitePlugin.ts';
 import { statusDevApiPlugin } from './server/status/devPlugin.ts';
+import { statusHtmlFallbackPlugin } from './server/status/htmlFallbackPlugin.ts';
 
 export default defineConfig({
-  plugins: [siteConfigPlugin(), statusDevApiPlugin(), react()],
+  plugins: [statusHtmlFallbackPlugin(), siteConfigPlugin(), statusDevApiPlugin(), react()],
   server: {
     port: 4321,
     strictPort: true,

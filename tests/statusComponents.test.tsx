@@ -1,15 +1,35 @@
 import { render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppProviders } from '../src/app/AppProviders';
 import StatusPage from '../src/components/StatusPage/StatusPage';
 import { createDemoStatusData } from '../server/status/demoData';
 
+beforeEach(() => {
+  window.localStorage.clear();
+});
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  window.localStorage.clear();
 });
 
 describe('status page', () => {
+  it('renders a recent local snapshot immediately while refreshing in the background', () => {
+    const data = createDemoStatusData(60);
+    window.localStorage.setItem('status-data-v1', JSON.stringify({ savedAt: Date.now(), data }));
+    vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})));
+
+    render(
+      <AppProviders>
+        <StatusPage />
+      </AppProviders>,
+    );
+
+    expect(screen.getByText('所有系统运行正常')).toBeInTheDocument();
+    expect(screen.getByText('系统状态')).toBeInTheDocument();
+  });
+
   it('renders grouped UptimeRobot data and working status controls', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,

@@ -11,6 +11,37 @@ interface StatusDataState {
   passwordRequired: boolean;
 }
 
+const STATUS_CACHE_KEY = 'status-data-v1';
+const STATUS_CACHE_MAX_AGE_MS = 10 * 60 * 1000;
+
+interface StoredStatusData {
+  savedAt: number;
+  data: StatusData;
+}
+
+function readStoredStatusData(): StatusData | undefined {
+  try {
+    const value = window.localStorage.getItem(STATUS_CACHE_KEY);
+    if (!value) return undefined;
+    const stored = JSON.parse(value) as StoredStatusData;
+    if (!stored.data || Date.now() - stored.savedAt > STATUS_CACHE_MAX_AGE_MS) {
+      window.localStorage.removeItem(STATUS_CACHE_KEY);
+      return undefined;
+    }
+    return stored.data;
+  } catch {
+    return undefined;
+  }
+}
+
+function storeStatusData(data: StatusData) {
+  try {
+    window.localStorage.setItem(STATUS_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), data }));
+  } catch {
+    // Storage can be unavailable in privacy-restricted browser contexts.
+  }
+}
+
 async function parseResponse(response: Response): Promise<StatusApiResponse> {
   try {
     return (await response.json()) as StatusApiResponse;
@@ -20,19 +51,23 @@ async function parseResponse(response: Response): Promise<StatusApiResponse> {
 }
 
 export function useStatusData() {
-  const [state, setState] = useState<StatusDataState>({
-    loading: true,
-    refreshing: false,
-    passwordRequired: false,
+  const [state, setState] = useState<StatusDataState>(() => {
+    const storedData = readStoredStatusData();
+    return {
+      ...(storedData ? { data: storedData } : {}),
+      loading: !storedData,
+      refreshing: Boolean(storedData),
+      passwordRequired: false,
+    };
   });
   const mountedRef = useRef(true);
 
-  const load = useCallback(async (manual = false) => {
+  const load = useCallback(async () => {
     setState((current) => ({
       ...current,
       error: undefined,
       loading: current.data ? false : true,
-      refreshing: manual && Boolean(current.data),
+      refreshing: Boolean(current.data),
     }));
 
     try {
@@ -51,6 +86,7 @@ export function useStatusData() {
         throw new Error(payload.message || '无法获取服务状态');
       }
       if (mountedRef.current) {
+        storeStatusData(payload.data);
         setState({
           data: payload.data,
           loading: false,
@@ -100,5 +136,5 @@ export function useStatusData() {
     };
   }, [load]);
 
-  return { ...state, login, refresh: () => load(true) };
+  return { ...state, login, refresh: load };
 }

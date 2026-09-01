@@ -38,10 +38,12 @@ interface DateRangeRequest {
 
 interface StatusCache {
   expiresAt: number;
+  staleUntil: number;
   data: StatusData;
 }
 
 let cache: StatusCache | undefined;
+let inFlightRequest: Promise<StatusData> | undefined;
 
 function startOfToday(): Date {
   const value = new Date();
@@ -147,27 +149,63 @@ export async function fetchStatusData(options: {
   apiUrl?: string;
   historyDays?: number;
   cacheTtlMs?: number;
+  staleTtlMs?: number;
+  timeoutMs?: number;
 }): Promise<{ data: StatusData; source: 'api' | 'cache' }> {
   const now = Date.now();
   if (cache && cache.expiresAt > now) return { data: cache.data, source: 'cache' };
 
+  if (inFlightRequest) {
+    try {
+      return { data: await inFlightRequest, source: 'cache' };
+    } catch (error) {
+      if (cache && cache.staleUntil > Date.now()) {
+        return { data: cache.data, source: 'cache' };
+      }
+      throw error;
+    }
+  }
+
   const historyDays = options.historyDays ?? 60;
   const ranges = buildDateRanges(historyDays);
-  const body = new URLSearchParams({
-    api_key: options.apiKey,
-    format: 'json',
-    custom_uptime_ranges: ranges.ranges,
-  });
-  const response = await fetch(`${options.apiUrl ?? 'https://api.uptimerobot.com/v2/'}getMonitors`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
-    signal: AbortSignal.timeout(20_000),
-  });
+  inFlightRequest = (async () => {
+    const body = new URLSearchParams({
+      api_key: options.apiKey,
+      format: 'json',
+      custom_uptime_ranges: ranges.ranges,
+    });
+    const response = await fetch(`${options.apiUrl ?? 'https://api.uptimerobot.com/v2/'}getMonitors`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+      signal: AbortSignal.timeout(options.timeoutMs ?? 8_000),
+    });
 
-  if (!response.ok) throw new Error(`UptimeRobot 请求失败（${response.status}）`);
-  const payload = (await response.json()) as UptimeRobotResponse;
-  const data = formatUptimeRobotData(payload, ranges);
-  cache = { data, expiresAt: now + (options.cacheTtlMs ?? 60_000) };
-  return { data, source: 'api' };
+    if (!response.ok) throw new Error(`UptimeRobot 请求失败（${response.status}）`);
+    const payload = (await response.json()) as UptimeRobotResponse;
+    return formatUptimeRobotData(payload, ranges);
+  })();
+
+  try {
+    const data = await inFlightRequest;
+    const completedAt = Date.now();
+    cache = {
+      data,
+      expiresAt: completedAt + (options.cacheTtlMs ?? 300_000),
+      staleUntil: completedAt + (options.staleTtlMs ?? 86_400_000),
+    };
+    return { data, source: 'api' };
+  } catch (error) {
+    if (cache && cache.staleUntil > Date.now()) {
+      return { data: cache.data, source: 'cache' };
+    }
+    throw error;
+  } finally {
+    inFlightRequest = undefined;
+  }
+}
+
+export function resetStatusCacheForTests() {
+  cache = undefined;
+  inFlightRequest = undefined;
 }

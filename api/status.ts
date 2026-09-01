@@ -5,6 +5,7 @@ import type { StatusApiResponse } from '../server/status/types.ts';
 import { fetchStatusData } from '../server/status/uptimeRobot.ts';
 
 export default async function handler(request: IncomingMessage, response: ServerResponse) {
+  const startedAt = Date.now();
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   response.setHeader('Cache-Control', 'private, no-store');
 
@@ -47,9 +48,25 @@ export default async function handler(request: IncomingMessage, response: Server
       data: result.data,
     };
     response.statusCode = 200;
-    response.setHeader('CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+    if (!isPasswordProtectionEnabled()) {
+      response.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300');
+      response.setHeader('CDN-Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+    }
+    response.setHeader('Server-Timing', `uptime-robot;dur=${Date.now() - startedAt}`);
+    // Structured timing is available in Vercel runtime logs for production diagnosis.
+    // eslint-disable-next-line no-console
+    console.info(JSON.stringify({
+      event: 'status.fetch.complete',
+      durationMs: Date.now() - startedAt,
+      source: result.source,
+    }));
     response.end(JSON.stringify(payload));
   } catch (error) {
+    console.error(JSON.stringify({
+      event: 'status.fetch.failed',
+      durationMs: Date.now() - startedAt,
+      message: error instanceof Error ? error.message : 'unknown',
+    }));
     response.statusCode = 502;
     response.end(JSON.stringify({
       code: 502,
