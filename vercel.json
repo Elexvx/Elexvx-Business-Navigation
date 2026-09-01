@@ -6,6 +6,12 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/status.ts": {
+      "regions": ["iad1"],
+      "maxDuration": 30
+    }
+  },
   "redirects": [
     {
       "source": "/status",
