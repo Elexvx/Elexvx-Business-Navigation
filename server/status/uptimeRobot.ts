@@ -42,6 +42,12 @@ interface StatusCache {
   data: StatusData;
 }
 
+interface RangeBatch {
+  ranges: string;
+  dayCount: number;
+  includesOverall: boolean;
+}
+
 let cache: StatusCache | undefined;
 let inFlightRequest: Promise<StatusData> | undefined;
 
@@ -82,6 +88,55 @@ function formatPercent(value: string | number | undefined): number {
 function dateKeyFromUnix(timestamp: number): string {
   const date = new Date(timestamp * 1000);
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}
+
+function createRangeBatches(ranges: DateRangeRequest, batchSize: number): RangeBatch[] {
+  const values = ranges.ranges.split('-');
+  const overall = values.pop();
+  if (!overall) throw new Error('无法生成 UptimeRobot 时间范围');
+
+  const batches: RangeBatch[] = [];
+  for (let index = 0; index < values.length; index += batchSize) {
+    const days = values.slice(index, index + batchSize);
+    const includesOverall = index === 0;
+    batches.push({
+      ranges: [...days, ...(includesOverall ? [overall] : [])].join('-'),
+      dayCount: days.length,
+      includesOverall,
+    });
+  }
+  return batches;
+}
+
+function mergeBatchResponses(
+  responses: UptimeRobotResponse[],
+  batches: RangeBatch[],
+): UptimeRobotResponse {
+  const baseMonitors = responses[0]?.monitors;
+  if (!Array.isArray(baseMonitors)) return responses[0] ?? {};
+  if (responses.length === 1) return responses[0];
+
+  return {
+    ...responses[0],
+    monitors: baseMonitors.map((baseMonitor, monitorIndex) => {
+      const dailyValues: string[] = [];
+      let overallValue = '0';
+
+      responses.forEach((response, batchIndex) => {
+        const monitor = response.monitors?.find((item) => item.id === baseMonitor.id)
+          ?? response.monitors?.[monitorIndex];
+        if (!monitor) throw new Error('UptimeRobot 分批响应缺少监控数据');
+        const values = (monitor.custom_uptime_ranges ?? '').split('-');
+        if (batches[batchIndex]?.includesOverall) overallValue = values.pop() ?? '0';
+        dailyValues.push(...values.slice(0, batches[batchIndex]?.dayCount));
+      });
+
+      return {
+        ...baseMonitor,
+        custom_uptime_ranges: `${dailyValues.join('-')}-${overallValue}`,
+      };
+    }),
+  };
 }
 
 export function formatUptimeRobotData(
@@ -151,6 +206,7 @@ export async function fetchStatusData(options: {
   cacheTtlMs?: number;
   staleTtlMs?: number;
   timeoutMs?: number;
+  rangeBatchSize?: number;
 }): Promise<{ data: StatusData; source: 'api' | 'cache' }> {
   const now = Date.now();
   if (cache && cache.expiresAt > now) return { data: cache.data, source: 'cache' };
@@ -169,20 +225,26 @@ export async function fetchStatusData(options: {
   const historyDays = options.historyDays ?? 60;
   const ranges = buildDateRanges(historyDays);
   inFlightRequest = (async () => {
-    const body = new URLSearchParams({
-      api_key: options.apiKey,
-      format: 'json',
-      custom_uptime_ranges: ranges.ranges,
-    });
-    const response = await fetch(`${options.apiUrl ?? 'https://api.uptimerobot.com/v2/'}getMonitors`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body,
-      signal: AbortSignal.timeout(options.timeoutMs ?? 20_000),
-    });
+    const batches = createRangeBatches(ranges, options.rangeBatchSize ?? 20);
+    const apiBaseUrl = options.apiUrl ?? 'https://api.uptimerobot.com/v2/';
+    const apiUrl = `${apiBaseUrl.replace(/\/+$/, '')}/getMonitors`;
+    const payloads = await Promise.all(batches.map(async (batch) => {
+      const body = new URLSearchParams({
+        api_key: options.apiKey,
+        format: 'json',
+        custom_uptime_ranges: batch.ranges,
+      });
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body,
+        signal: AbortSignal.timeout(options.timeoutMs ?? 20_000),
+      });
 
-    if (!response.ok) throw new Error(`UptimeRobot 请求失败（${response.status}）`);
-    const payload = (await response.json()) as UptimeRobotResponse;
+      if (!response.ok) throw new Error(`UptimeRobot 请求失败（${response.status}）`);
+      return (await response.json()) as UptimeRobotResponse;
+    }));
+    const payload = mergeBatchResponses(payloads, batches);
     return formatUptimeRobotData(payload, ranges);
   })();
 

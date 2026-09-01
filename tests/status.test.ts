@@ -142,4 +142,28 @@ describe('status routing and aggregation', () => {
     expect(fallback.source).toBe('cache');
     expect(fallback.data.monitors[0]?.name).toBe('A01-企业官网');
   });
+
+  it('splits long custom uptime histories into smaller parallel requests', async () => {
+    const fetchMock = vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+      const body = init?.body as URLSearchParams;
+      const rangeCount = body.get('custom_uptime_ranges')?.split('-').length ?? 0;
+      return new Response(JSON.stringify({
+        monitors: [{
+          id: 1,
+          friendly_name: 'A01-企业官网',
+          status: 2,
+          type: 1,
+          interval: 300,
+          custom_uptime_ranges: Array.from({ length: rangeCount }, () => '100').join('-'),
+        }],
+      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchStatusData({ apiKey: 'test', historyDays: 45, rangeBatchSize: 20 });
+
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(result.data.monitors[0]?.days).toHaveLength(45);
+    expect(result.data.monitors[0]?.percent).toBe(100);
+  });
 });
