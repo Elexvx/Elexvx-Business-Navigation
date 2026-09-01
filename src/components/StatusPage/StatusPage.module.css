@@ -1,4 +1,5 @@
 .statusPage {
+  --status-identity-column: 280px;
   --status-healthy: #36a269;
   --status-warning: #d5a11e;
   --status-error: #d14343;
@@ -92,7 +93,7 @@
   display: grid;
   min-width: 0;
   align-items: center;
-  grid-template-columns: minmax(190px, 1fr) minmax(240px, 1.5fr) 82px;
+  grid-template-columns: var(--status-identity-column) minmax(240px, 1fr) 82px;
   gap: 18px;
 }
 
@@ -183,7 +184,7 @@
   display: grid;
   min-height: 64px;
   align-items: center;
-  grid-template-columns: minmax(190px, 1fr) minmax(240px, 1.5fr) 82px;
+  grid-template-columns: var(--status-identity-column) minmax(240px, 1fr) 82px;
   gap: 18px;
   padding: 12px 24px 12px 0;
   border-bottom: 1px solid var(--ant-color-border-secondary);

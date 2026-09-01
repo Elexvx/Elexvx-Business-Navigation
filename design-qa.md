@@ -1,70 +1,67 @@
-# 服务状态条对齐设计验收
+# 服务状态左侧列宽设计验收
 
 **Findings**
 
 - 当前没有遗留的 P0、P1 或 P2 设计问题。
-- [P3] 总览条与服务条的右边缘仍存在约 1 CSS px 的抗锯齿/边框取整差异，不构成可见错位，也不会随内容变化累积。
+- 左侧身份列由约 410px 收窄并限制为 280px，服务名称和检测说明均完整显示，没有横向越界。
 
 **Comparison Target**
 
-- Source visual truth: `/var/folders/k4/mgjk9gsj2q16n5_csyg45bp40000gn/T/codex-clipboard-463560c2-ae45-456b-8630-55fc090e30be.png`
-- Full implementation screenshot: `/tmp/elexvx-status-alignment-after.png`
-- Focused implementation screenshot: `/tmp/elexvx-status-alignment-focused-after.png`
-- Combined comparison: `/tmp/elexvx-status-alignment-comparison-square.svg.png`
-- Route/state: `http://127.0.0.1:4321/status`, light theme, healthy demo data, first service group expanded.
+- Source visual truth: `/tmp/elexvx-status-left-column-before.png`
+- Implementation screenshot: `/tmp/elexvx-status-left-column-after.png`
+- Combined comparison: `/tmp/elexvx-status-left-column-comparison.svg.png`
+- Route/state: `/status`, light theme, desktop, first service group expanded.
 
 **Viewport and Normalization**
 
-- Source crop: 1326 × 1342 px; it is a user-provided focused crop rather than a complete browser viewport.
-- Implementation browser viewport: 1280 × 720 CSS px at device pixel ratio 2.
-- Full implementation capture: 1265 × 1200 px; focused capture: 1200 × 360 px.
-- The in-app browser screenshot API emitted CSS-pixel-sized captures, so no extra 2× downsampling was applied.
-- The combined 1840 × 1840 px comparison places the source crop and focused implementation in one image. Because the source is a marked crop, comparison is limited to the availability-bar alignment surface rather than page-wide scale.
+- Source and implementation CSS viewport: 1280 × 720.
+- Source and implementation focused captures: 1220 × 500 px.
+- Browser device pixel ratio: 2; the in-app screenshot API emitted CSS-pixel-sized captures, so no density conversion was required.
+- The source capture uses production data while the implementation capture uses local demo data. Comparison is intentionally limited to the shared row geometry, left-column width, status-strip alignment and overflow behavior; service counts are not treated as visual drift.
 
 **Full-view Comparison Evidence**
 
-- `/tmp/elexvx-status-alignment-after.png` confirms the status card, expanded service group, row dividers, uptime values and external-link controls remain intact after the grid change.
-- Typography, colors, status semantics, image assets and copy are unchanged by this alignment-only fix.
-- The status card has no horizontal overflow at desktop or mobile viewports.
+- Both captures retain the Ant Design status card, group hierarchy, dividers, availability strips, percentages, external-link actions, history action and footer.
+- The fix changes only the shared identity-column track. Typography, semantic colors, brand assets, copy style and component structure remain unchanged.
+- No desktop or mobile horizontal overflow is present.
 
 **Focused-region Evidence**
 
-- `/tmp/elexvx-status-alignment-comparison-square.svg.png` places the marked source region and the revised bar region into one visual comparison input.
-- The reference calls for every 60-day strip to share the same left and right endpoints.
-- Browser measurements after the fix: group strip `x=477.0`, `right=1092.0`; first monitor strip `x=477.195`, `right=1091.0` at the 1280 px viewport.
-- All expanded monitor rows reuse the same grid tracks and therefore repeat the same measured endpoints.
+- `/tmp/elexvx-status-left-column-comparison.svg.png` places the 410px and 280px states in one comparison input.
+- Before: group identity width 410px; monitor identity width 409.2px; availability strip began at x=477.
+- After: group and monitor identity widths are both 280px; availability strips begin at x=347–348 and retain matching right endpoints at x=1091–1092.
+- The new layout removes approximately 130px of unused left-column space without truncating the longest visible service name.
 
 **Required Fidelity Surfaces**
 
-- Fonts and typography: unchanged Ant Design/system Chinese font stack; no new wrapping, clipping or weight drift.
-- Spacing and layout rhythm: group and monitor rows now share the same identity, availability and uptime tracks; monitor actions are isolated from those tracks.
-- Colors and visual tokens: existing healthy, warning, error and unknown semantic colors are unchanged.
-- Image quality and asset fidelity: no image or logo changes were made.
-- Copy and content: service names, cadence, percentages and navigation copy are unchanged.
+- Fonts and typography: unchanged Ant Design/system Chinese stack; names and metadata remain single-line and readable.
+- Spacing and layout rhythm: shared group/monitor identity track is capped at 280px; availability and uptime tracks remain aligned.
+- Colors and visual tokens: healthy, warning, error and unknown state tokens are unchanged.
+- Image quality and asset fidelity: no image or logo changes.
+- Copy and content: no content-contract changes.
 
 **Interaction and Accessibility Evidence**
 
-- Tested desktop 1440 × 900 and mobile 390 × 844 through Playwright.
-- Tested group rendering, history navigation, mobile hierarchy and horizontal-overflow guards.
-- Availability strips retain their labelled `role="img"`; external service links remain keyboard accessible.
-- Axe reports zero violations in the status-page end-to-end test.
-- Browser console and page-error collection returned no application errors.
+- Desktop 1440 × 900 and mobile 390 × 844 end-to-end checks passed.
+- Group visibility, history navigation, compact mobile hierarchy and overflow guards passed.
+- Axe reports zero violations; labelled availability graphics and keyboard-accessible external links are preserved.
+- Browser console contains no errors or warnings after the revised local render.
 
 **Comparison History**
 
-1. [P2] Aggregate bars and monitor bars used different grid definitions, gaps and content padding; production measurement showed `x=461/right=1052` versus `x=454/right=1033`.
-   - Fix: corrected the Ant Design 6 collapse-body selector, unified the three content tracks, and removed the external action from the sizing grid.
-   - Post-fix evidence: `x=477/right=1092` versus `x=477.195/right=1091` in the focused local capture.
-2. [P2] The layout had no automated guard against this regression.
-   - Fix: added an end-to-end assertion requiring the aggregate and first monitor strip endpoints to remain within 1 CSS px.
-   - Post-fix evidence: 5/5 Playwright tests passed at desktop and mobile breakpoints.
+1. [P2] The flexible identity track expanded to about 410px, creating an oversized left region and pushing the availability history too far right.
+   - Fix: introduced a shared 280px identity-column token for group and monitor grids.
+   - Post-fix evidence: focused capture and browser measurements show 280px identity tracks with no text clipping.
+2. [P2] The previous regression test guarded bar-to-bar alignment but did not constrain excessive left-column growth.
+   - Fix: added a 1440px viewport assertion that prevents the status strip from drifting beyond the intended horizontal position.
+   - Post-fix evidence: 5/5 Playwright tests passed.
 
 **Implementation Checklist**
 
-- [x] Align aggregate and per-service availability strips.
-- [x] Keep uptime and external-link controls aligned.
-- [x] Preserve compact mobile rows and hide strips below 768 px.
-- [x] Add endpoint-alignment regression coverage.
+- [x] Limit left identity column to 280px.
+- [x] Preserve group and monitor bar alignment.
+- [x] Preserve percentages and external-link actions.
+- [x] Preserve compact mobile layout.
 - [x] Typecheck, lint, unit tests, build, Playwright and Axe pass.
 
 **Open Questions**
