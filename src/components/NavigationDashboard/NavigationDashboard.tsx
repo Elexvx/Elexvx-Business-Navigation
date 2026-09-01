@@ -89,8 +89,6 @@ function DirectoryGrid({ links }: { links: NavigationLink[] }) {
 }
 
 function NavigationSection({ category }: { category: NavigationCategory }) {
-  const entryCount = countCategoryLinks(category);
-
   return (
     <section
       id={`category-${category.id}`}
@@ -104,9 +102,6 @@ function NavigationSection({ category }: { category: NavigationCategory }) {
         <Typography.Title id={`heading-${category.id}`} level={2} className={styles.categoryTitle}>
           {category.category}
         </Typography.Title>
-        <span className={styles.categoryCount} aria-label={`${entryCount} 个入口`}>
-          {entryCount}
-        </span>
       </div>
 
       <DirectoryGrid links={category.links} />
@@ -120,13 +115,6 @@ function NavigationSection({ category }: { category: NavigationCategory }) {
         </div>
       ))}
     </section>
-  );
-}
-
-function countCategoryLinks(category: NavigationCategory): number {
-  return category.links.length + category.subcategories.reduce(
-    (total, subcategory) => total + subcategory.links.length,
-    0,
   );
 }
 

@@ -24,6 +24,7 @@ describe('navigation components', () => {
     expect(screen.queryByText('分类数量')).not.toBeInTheDocument();
     expect(screen.queryByText('可用')).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/标签/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/个入口/)).not.toBeInTheDocument();
   }, 10_000);
 
   it('scrolls and updates the hash when a menu category is selected', async () => {

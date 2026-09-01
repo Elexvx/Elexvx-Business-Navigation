@@ -33,20 +33,6 @@
   letter-spacing: -0.01em;
 }
 
-.categoryCount {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  padding-inline: 7px;
-  color: var(--ant-color-text-secondary);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-  background: var(--ant-color-fill-secondary);
-  border-radius: 999px;
-}
-
 .directoryCard {
   overflow: hidden;
   border-color: var(--ant-color-border-secondary);
