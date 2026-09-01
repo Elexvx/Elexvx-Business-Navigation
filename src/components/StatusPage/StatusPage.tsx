@@ -277,16 +277,17 @@ export default function StatusPage({ history = false }: StatusPageProps) {
   useEffect(() => updateMetadata(history), [history]);
 
   return (
-    <div className={styles.statusPage}>
-      <header className={styles.statusHeader}>
-        <div className={styles.statusHeaderInner}>
-          <a className={styles.statusBrand} href={statusHomeHref(hostname)}>
-            <img src={siteConfig.site.logo} alt={`${siteConfig.site.name} Logo`} />
-            <span>
-              <Typography.Text className={styles.brandName} strong>{siteConfig.site.name}</Typography.Text>
-              <Typography.Text className={styles.brandSection} type="secondary">服务状态</Typography.Text>
-            </span>
-          </a>
+    <section className={styles.statusPage}>
+      <div className={styles.statusMain}>
+        <div className={styles.statusPageToolbar}>
+          <div>
+            <Typography.Title level={1}>
+              {history ? '历史可用性' : '服务状态'}
+            </Typography.Title>
+            <Typography.Text type="secondary">
+              {history ? '查看最近 60 天的服务运行记录' : '实时查看企业服务与项目服务运行情况'}
+            </Typography.Text>
+          </div>
           <Space>
             <Tooltip title="刷新状态">
               <Button
@@ -301,12 +302,6 @@ export default function StatusPage({ history = false }: StatusPageProps) {
             <Button icon={<BellOutlined />} onClick={() => setSubscribeOpen(true)}>订阅通知</Button>
           </Space>
         </div>
-      </header>
-
-      <main className={styles.statusMain}>
-        <h1 className={styles.srOnly}>
-          {history ? `${siteConfig.status.title}历史记录` : siteConfig.status.title}
-        </h1>
         {history ? (
           <div className={styles.historyBack}>
             <Button href={statusHomeHref(hostname)} icon={<ArrowLeftOutlined />} type="text">返回当前状态</Button>
@@ -336,16 +331,7 @@ export default function StatusPage({ history = false }: StatusPageProps) {
             ) : null}
           </>
         )}
-      </main>
-
-      <footer className={styles.statusFooter}>
-        <Typography.Text type="secondary">{new Date().getFullYear()} © {siteConfig.site.copyright}</Typography.Text>
-        {siteConfig.site.icp ? (
-          <Typography.Link href="https://beian.miit.gov.cn/" rel="noreferrer" target="_blank">
-            ICP备案：{siteConfig.site.icp}
-          </Typography.Link>
-        ) : null}
-      </footer>
+      </div>
 
       <Modal
         centered
@@ -359,6 +345,6 @@ export default function StatusPage({ history = false }: StatusPageProps) {
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />
       </Modal>
-    </div>
+    </section>
   );
 }

@@ -17,6 +17,7 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useThemeMode } from '../../app/AppProviders';
+import { navigationHomeHref, statusHomeHref } from '../../app/routes';
 import { useActiveNavigation } from '../../app/useActiveNavigation';
 import { siteConfig } from '../../config/site';
 import type { NavigationCategory } from '../../types/site';
@@ -27,13 +28,15 @@ const { useBreakpoint } = Grid;
 
 export interface AppShellProps {
   navigation: NavigationCategory[];
-  searchPanel: ReactNode;
-  dashboard: ReactNode;
+  searchPanel?: ReactNode;
+  dashboard?: ReactNode;
+  children?: ReactNode;
+  selectedNavigationKey?: string;
 }
 
-function Brand({ compact = false }: { compact?: boolean }) {
+function Brand({ compact = false, href }: { compact?: boolean; href: string }) {
   return (
-    <div className={`app-shell-brand${compact ? ' app-shell-brand-compact' : ''}`}>
+    <a className={`app-shell-brand${compact ? ' app-shell-brand-compact' : ''}`} href={href}>
       <img src={siteConfig.site.logo} alt={`${siteConfig.site.name} Logo`} />
       <div>
         <Typography.Text className="app-shell-brand-name" strong>
@@ -43,17 +46,30 @@ function Brand({ compact = false }: { compact?: boolean }) {
           {siteConfig.site.shortName}
         </Typography.Text>
       </div>
-    </div>
+    </a>
   );
 }
 
-export function AppShell({ navigation, searchPanel, dashboard }: AppShellProps) {
+export function AppShell({
+  navigation,
+  searchPanel,
+  dashboard,
+  children,
+  selectedNavigationKey,
+}: AppShellProps) {
   const screens = useBreakpoint();
   const isDesktop = Boolean(screens.lg);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const selectedKey = useActiveNavigation(navigation);
+  const activeNavigationKey = useActiveNavigation(navigation);
+  const selectedKey = selectedNavigationKey ?? activeNavigationKey;
   const { mode, toggleMode } = useThemeMode();
+  const hostname = window.location.hostname;
+  const navigationHref = navigationHomeHref(hostname);
+  const statusHref = statusHomeHref(hostname);
+  const navigationHrefBase = selectedNavigationKey === 'service-status'
+    ? navigationHref
+    : undefined;
 
   const restoreMenuFocus = useCallback(() => {
     // Drawer motion/focus-lock can move focus to body after the first frame;
@@ -103,7 +119,7 @@ export function AppShell({ navigation, searchPanel, dashboard }: AppShellProps) 
               type="text"
             />
           ) : null}
-          <Brand compact={!isDesktop} />
+          <Brand compact={!isDesktop} href={navigationHref} />
         </div>
 
         {isDesktop ? (
@@ -129,7 +145,9 @@ export function AppShell({ navigation, searchPanel, dashboard }: AppShellProps) 
               className="app-shell-header-menu"
               mode="horizontal"
               navigation={navigation}
+              navigationHrefBase={navigationHrefBase}
               selectedKey={selectedKey}
+              statusHref={statusHref}
               theme={mode}
             />
           </ConfigProvider>
@@ -148,23 +166,27 @@ export function AppShell({ navigation, searchPanel, dashboard }: AppShellProps) 
       </Header>
 
       <Content className="app-shell-content">
-        <section className="app-shell-hero" aria-labelledby="portal-title">
-          <div className="app-shell-hero-inner">
-            <div className="app-shell-hero-heading">
-              <Typography.Title id="portal-title" level={1}>
-                企业服务导航
-              </Typography.Title>
-            </div>
-            <Typography.Paragraph className="app-shell-hero-description" type="secondary">
-              汇聚企业内部系统与外部政务服务，一站直达，高效协同。
-            </Typography.Paragraph>
-            <div className="app-shell-hero-search">{searchPanel}</div>
-          </div>
-        </section>
+        {children ?? (
+          <>
+            <section className="app-shell-hero" aria-labelledby="portal-title">
+              <div className="app-shell-hero-inner">
+                <div className="app-shell-hero-heading">
+                  <Typography.Title id="portal-title" level={1}>
+                    企业服务导航
+                  </Typography.Title>
+                </div>
+                <Typography.Paragraph className="app-shell-hero-description" type="secondary">
+                  汇聚企业内部系统与外部政务服务，一站直达，高效协同。
+                </Typography.Paragraph>
+                <div className="app-shell-hero-search">{searchPanel}</div>
+              </div>
+            </section>
 
-        <div className="app-shell-directory">
-          {dashboard}
-        </div>
+            <div className="app-shell-directory">
+              {dashboard}
+            </div>
+          </>
+        )}
       </Content>
 
       <Footer className="app-shell-footer">
@@ -194,15 +216,17 @@ export function AppShell({ navigation, searchPanel, dashboard }: AppShellProps) 
         open={mobileMenuOpen && !isDesktop}
         placement="left"
         rootClassName="app-shell-drawer"
-        title={<Brand compact />}
+        title={<Brand compact href={navigationHref} />}
         size={256}
         styles={{ body: { padding: '8px 12px 24px' } }}
       >
         <NavigationMenu
           className="app-shell-drawer-menu"
           navigation={navigation}
+          navigationHrefBase={navigationHrefBase}
           onNavigationComplete={closeMobileMenu}
           selectedKey={selectedKey}
+          statusHref={statusHref}
           theme={mode}
           mode="inline"
         />

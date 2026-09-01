@@ -21,3 +21,9 @@ export function statusHistoryHref(hostname: string): string {
 export function statusHomeHref(hostname: string): string {
   return hostname.toLocaleLowerCase() === 'status.elexvx.com' ? '/' : '/status';
 }
+
+export function navigationHomeHref(hostname: string): string {
+  return hostname.toLocaleLowerCase() === 'status.elexvx.com'
+    ? 'https://nav.elexvx.com/'
+    : '/';
+}

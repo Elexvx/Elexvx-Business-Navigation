@@ -14,9 +14,11 @@ export default function App() {
 
   if (route === 'status' || route === 'status-history') {
     return (
-      <Suspense fallback={<div className="route-loading"><Spin size="large" /></div>}>
-        <StatusPage history={route === 'status-history'} />
-      </Suspense>
+      <AppShell navigation={siteConfig.navigation} selectedNavigationKey="service-status">
+        <Suspense fallback={<div className="route-loading"><Spin size="large" /></div>}>
+          <StatusPage history={route === 'status-history'} />
+        </Suspense>
+      </AppShell>
     );
   }
 

@@ -7,8 +7,6 @@ import type { PropsWithChildren } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import zhCN from 'antd/locale/zh_CN';
 
-import { resolveAppRoute } from './routes';
-
 export const THEME_STORAGE_KEY = 'theme';
 
 export type ThemeMode = 'light' | 'dark';
@@ -42,24 +40,19 @@ export function useThemeMode(): ThemeContextValue {
 }
 
 export function AppProviders({ children }: PropsWithChildren) {
-  const route = typeof window === 'undefined'
-    ? 'navigation'
-    : resolveAppRoute(window.location.hostname, window.location.pathname);
-  const forceLightTheme = route === 'status' || route === 'status-history';
   const [mode, setMode] = useState<ThemeMode>(getStoredTheme);
-  const activeMode: ThemeMode = forceLightTheme ? 'light' : mode;
+  const activeMode: ThemeMode = mode;
 
   useEffect(() => {
     document.documentElement.dataset.theme = activeMode;
     document.documentElement.style.colorScheme = activeMode;
 
-    if (forceLightTheme) return;
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, mode);
     } catch {
       // Storage can be unavailable in privacy-restricted browser contexts.
     }
-  }, [activeMode, forceLightTheme, mode]);
+  }, [activeMode, mode]);
 
   const contextValue = useMemo<ThemeContextValue>(
     () => ({

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveAppRoute, statusHistoryHref, statusHomeHref } from '../src/app/routes';
+import {
+  navigationHomeHref,
+  resolveAppRoute,
+  statusHistoryHref,
+  statusHomeHref,
+} from '../src/app/routes';
 import {
   availabilityTone,
   groupStatusMonitors,
@@ -35,6 +40,8 @@ describe('status routing and aggregation', () => {
     expect(resolveAppRoute('nav.elexvx.com', '/')).toBe('navigation');
     expect(statusHomeHref('status.elexvx.com')).toBe('/');
     expect(statusHistoryHref('nav.elexvx.com')).toBe('/status/history');
+    expect(navigationHomeHref('status.elexvx.com')).toBe('https://nav.elexvx.com/');
+    expect(navigationHomeHref('nav.elexvx.com')).toBe('/');
   });
 
   it('groups monitors by configured prefix and derives aggregate status', () => {

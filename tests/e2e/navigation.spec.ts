@@ -172,6 +172,9 @@ test('status page matches the compact desktop design and exposes working history
   await page.goto('/status');
 
   await expect(page).toHaveTitle('宏翔商道服务状态');
+  await expect(page.locator('.app-shell-header-menu')).toBeVisible();
+  await expect(page.locator('.app-shell-header-menu .ant-menu-item-selected')).toContainText('服务状态');
+  await expect(page.getByRole('link', { name: '企业系统' })).toHaveAttribute('href', /#category-/);
   await expect(page.getByText('所有系统运行正常')).toBeVisible();
   await expect(page.getByText('系统状态')).toBeVisible();
   await expect(page.getByText('企业服务', { exact: true })).toBeVisible();
@@ -190,7 +193,7 @@ test('status page matches the compact desktop design and exposes working history
 
   await page.getByRole('link', { name: /查看历史记录/ }).click();
   await expect(page).toHaveURL(/\/status\/history$/);
-  await expect(page.getByText('历史可用性')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '历史可用性', level: 1 })).toBeVisible();
 });
 
 test('status page keeps the mobile hierarchy compact without horizontal overflow', async ({ page }) => {

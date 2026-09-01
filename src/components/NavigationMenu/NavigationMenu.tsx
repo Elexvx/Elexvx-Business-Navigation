@@ -22,6 +22,8 @@ export interface NavigationMenuProps {
   theme?: 'light' | 'dark';
   className?: string;
   mode?: MenuProps['mode'];
+  navigationHrefBase?: string;
+  statusHref?: string;
 }
 
 function scrollToAnchor(id: string): void {
@@ -45,6 +47,8 @@ export function NavigationMenu({
   theme = 'light',
   className,
   mode = 'inline',
+  navigationHrefBase,
+  statusHref = '/status',
 }: NavigationMenuProps) {
   const items = useMemo<MenuProps['items']>(
     () =>
@@ -57,7 +61,9 @@ export function NavigationMenu({
           return {
             key: categoryKey,
             icon: mode === 'inline' ? <AppstoreOutlined /> : undefined,
-            label: category.category,
+            label: navigationHrefBase === undefined
+              ? category.category
+              : <a href={`${navigationHrefBase}#${encodeURIComponent(categoryAnchor)}`}>{category.category}</a>,
           };
         }
 
@@ -70,7 +76,13 @@ export function NavigationMenu({
             return {
               key: subcategoryKey,
               icon: mode === 'inline' ? <FolderOpenOutlined /> : undefined,
-              label: `${subcategory.name}（${subcategory.links.length}）`,
+              label: navigationHrefBase === undefined
+                ? `${subcategory.name}（${subcategory.links.length}）`
+                : (
+                    <a href={`${navigationHrefBase}#${encodeURIComponent(subcategoryKey)}`}>
+                      {subcategory.name}（${subcategory.links.length}）
+                    </a>
+                  ),
             };
           }),
           onTitleClick: () => {
@@ -83,13 +95,19 @@ export function NavigationMenu({
         {
           key: 'service-status',
           icon: mode === 'inline' ? <DashboardOutlined /> : undefined,
-          label: <a href="/status">服务状态</a>,
+          label: <a href={statusHref}>服务状态</a>,
         },
       ],
-    [mode, navigation, onNavigate, onNavigationComplete],
+    [mode, navigation, navigationHrefBase, onNavigate, onNavigationComplete, statusHref],
   );
 
   const handleClick: MenuProps['onClick'] = ({ key }) => {
+    if (navigationHrefBase !== undefined) {
+      onNavigate?.(key);
+      onNavigationComplete?.();
+      return;
+    }
+
     const anchorId = key.startsWith('subcategory-')
       ? key
       : key.startsWith('category-')
