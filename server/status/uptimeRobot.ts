@@ -156,10 +156,6 @@ export async function fetchStatusData(options: {
   const body = new URLSearchParams({
     api_key: options.apiKey,
     format: 'json',
-    logs: '1',
-    log_types: '1-2',
-    logs_start_date: String(ranges.start),
-    logs_end_date: String(ranges.end),
     custom_uptime_ranges: ranges.ranges,
   });
   const response = await fetch(`${options.apiUrl ?? 'https://api.uptimerobot.com/v2/'}getMonitors`, {
