@@ -185,8 +185,14 @@ test('status page matches the compact desktop design and exposes working history
 
   const groupAvailability = await page.getByLabel('企业服务最近 60 天可用性').boundingBox();
   const monitorAvailability = await page.getByLabel('企业官网最近 60 天可用性').boundingBox();
+  const groupName = await page.getByText('企业服务', { exact: true }).boundingBox();
+  const monitorName = await page.getByText('企业官网', { exact: true }).boundingBox();
   expect(groupAvailability).not.toBeNull();
   expect(monitorAvailability).not.toBeNull();
+  expect(groupName).not.toBeNull();
+  expect(monitorName).not.toBeNull();
+  expect(monitorName!.x - groupName!.x).toBeGreaterThanOrEqual(20);
+  expect(monitorName!.x - groupName!.x).toBeLessThanOrEqual(30);
   expect(groupAvailability!.x).toBeLessThanOrEqual(410);
   expect(Math.abs(groupAvailability!.x - monitorAvailability!.x)).toBeLessThanOrEqual(1);
   expect(

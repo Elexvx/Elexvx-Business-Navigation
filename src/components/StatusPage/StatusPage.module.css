@@ -105,6 +105,11 @@
   gap: 10px;
 }
 
+.monitorIdentity {
+  box-sizing: border-box;
+  padding-inline-start: 24px;
+}
+
 .groupName,
 .monitorName {
   overflow: hidden;
@@ -338,6 +343,10 @@
     grid-template-columns: 1fr 28px;
     gap: 12px;
     padding-inline: 12px;
+  }
+
+  .monitorIdentity {
+    padding-inline-start: 12px;
   }
 
   .monitorAction {
