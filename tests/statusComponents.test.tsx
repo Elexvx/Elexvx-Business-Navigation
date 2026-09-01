@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AppProviders } from '../src/app/AppProviders';
@@ -22,7 +21,6 @@ describe('status page', () => {
         data: createDemoStatusData(60),
       }),
     }));
-    const user = userEvent.setup();
     render(
       <AppProviders>
         <StatusPage />
@@ -38,9 +36,7 @@ describe('status page', () => {
       'href',
       '/status/history',
     );
-
-    await user.click(screen.getByRole('button', { name: /订阅通知/ }));
-    expect(await screen.findByRole('dialog', { name: '订阅服务通知' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /订阅通知/ })).not.toBeInTheDocument();
   });
 
   it('shows the password form when the status API requires authentication', async () => {

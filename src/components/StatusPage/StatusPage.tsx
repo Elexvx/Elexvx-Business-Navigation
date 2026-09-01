@@ -1,6 +1,5 @@
 import {
   ArrowLeftOutlined,
-  BellOutlined,
   CalendarOutlined,
   CheckCircleFilled,
   CloseCircleFilled,
@@ -14,10 +13,8 @@ import {
   Button,
   Card,
   Collapse,
-  Empty,
   Form,
   Input,
-  Modal,
   Result,
   Skeleton,
   Space,
@@ -271,7 +268,6 @@ function updateMetadata(history: boolean) {
 
 export default function StatusPage({ history = false }: StatusPageProps) {
   const { data, error, loading, refreshing, passwordRequired, login, refresh } = useStatusData();
-  const [subscribeOpen, setSubscribeOpen] = useState(false);
   const hostname = window.location.hostname;
 
   useEffect(() => updateMetadata(history), [history]);
@@ -299,7 +295,6 @@ export default function StatusPage({ history = false }: StatusPageProps) {
                 type="text"
               />
             </Tooltip>
-            <Button icon={<BellOutlined />} onClick={() => setSubscribeOpen(true)}>订阅通知</Button>
           </Space>
         </div>
         {history ? (
@@ -332,19 +327,6 @@ export default function StatusPage({ history = false }: StatusPageProps) {
           </>
         )}
       </div>
-
-      <Modal
-        centered
-        footer={<Button onClick={() => setSubscribeOpen(false)} type="primary">知道了</Button>}
-        onCancel={() => setSubscribeOpen(false)}
-        open={subscribeOpen}
-        title="订阅服务通知"
-      >
-        <Empty
-          description="邮件与飞书订阅通道正在接入；当前页面会每 5 分钟自动刷新。"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
-      </Modal>
     </section>
   );
 }

@@ -210,6 +210,5 @@ test('status page keeps the mobile hierarchy compact without horizontal overflow
   );
   expect(hasHorizontalOverflow).toBe(false);
 
-  await page.getByRole('button', { name: /订阅通知/ }).click();
-  await expect(page.getByRole('dialog', { name: '订阅服务通知' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /订阅通知/ })).toHaveCount(0);
 });
