@@ -183,6 +183,18 @@ test('status page matches the compact desktop design and exposes working history
   await expect(page.getByText('企业官网', { exact: true })).toBeVisible();
   await expect(page.getByLabel('企业官网最近 60 天可用性')).toBeVisible();
 
+  const groupAvailability = await page.getByLabel('企业服务最近 60 天可用性').boundingBox();
+  const monitorAvailability = await page.getByLabel('企业官网最近 60 天可用性').boundingBox();
+  expect(groupAvailability).not.toBeNull();
+  expect(monitorAvailability).not.toBeNull();
+  expect(Math.abs(groupAvailability!.x - monitorAvailability!.x)).toBeLessThanOrEqual(1);
+  expect(
+    Math.abs(
+      (groupAvailability!.x + groupAvailability!.width)
+      - (monitorAvailability!.x + monitorAvailability!.width),
+    ),
+  ).toBeLessThanOrEqual(1);
+
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   );

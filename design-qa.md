@@ -1,77 +1,78 @@
-# 服务状态页设计验收
+# 服务状态条对齐设计验收
 
 **Findings**
 
 - 当前没有遗留的 P0、P1 或 P2 设计问题。
-- [P3] 设计稿中的抽象图标未直接用于成品；实现保留了项目现有的 Elexvx 品牌 Logo。这是品牌资产约束下的有意差异，不影响布局与功能。
-- [P3] 设计稿使用示意分组和组件数量，实现展示 UptimeRobot 的真实分组契约与当前 9 个监控项，因此文案和行数会随监控配置变化。
+- [P3] 总览条与服务条的右边缘仍存在约 1 CSS px 的抗锯齿/边框取整差异，不构成可见错位，也不会随内容变化累积。
 
 **Comparison Target**
 
-- Source visual truth: `design/status-page-reference.png`
-- Desktop implementation: `design/qa/status-desktop-normalized.jpg`
-- Mobile implementation: `design/qa/status-mobile-postfix.jpg`
-- Combined comparison: `design/qa/status-desktop-comparison-normalized.png`
+- Source visual truth: `/var/folders/k4/mgjk9gsj2q16n5_csyg45bp40000gn/T/codex-clipboard-463560c2-ae45-456b-8630-55fc090e30be.png`
+- Full implementation screenshot: `/tmp/elexvx-status-alignment-after.png`
+- Focused implementation screenshot: `/tmp/elexvx-status-alignment-focused-after.png`
+- Combined comparison: `/tmp/elexvx-status-alignment-comparison-square.svg.png`
 - Route/state: `http://127.0.0.1:4321/status`, light theme, healthy demo data, first service group expanded.
 
 **Viewport and Normalization**
 
-- Source image: 1610 × 977 px. Its desktop board occupies the left 1218 × 977 px; that region was normalized to 1200 × 965 px for the desktop comparison.
-- Desktop browser viewport: 1215 × 977 CSS px. The page content viewport is 1200 px wide after the browser scrollbar; the screenshot is 1200 × 965 px.
-- Mobile browser viewport: 390 × 844 CSS px. The content viewport is 375 px wide after the browser scrollbar; the screenshot is 375 × 812 px.
-- Browser device pixel ratio was 2. The in-app browser screenshot API emitted CSS-pixel-sized captures, so no additional 2× downsampling was applied to implementation screenshots.
-- The source mobile design includes a phone bezel while the implementation capture is content-only. Mobile evidence is therefore used for responsive hierarchy and overflow validation, not bezel-level pixel comparison.
+- Source crop: 1326 × 1342 px; it is a user-provided focused crop rather than a complete browser viewport.
+- Implementation browser viewport: 1280 × 720 CSS px at device pixel ratio 2.
+- Full implementation capture: 1265 × 1200 px; focused capture: 1200 × 360 px.
+- The in-app browser screenshot API emitted CSS-pixel-sized captures, so no extra 2× downsampling was applied.
+- The combined 1840 × 1840 px comparison places the source crop and focused implementation in one image. Because the source is a marked crop, comparison is limited to the availability-bar alignment surface rather than page-wide scale.
 
 **Full-view Comparison Evidence**
 
-- `design/qa/status-desktop-comparison-normalized.png` places the normalized source desktop board and implementation at the same 1200 × 965 content size.
-- Layout hierarchy matches the selected direction: compact brand header, green overall-status alert, bordered system-status surface, grouped availability history, monitor rows, history action, and restrained footer.
-- Typography uses the Ant Design/system Chinese font stack with coherent title, group, monitor, metadata, and numeric hierarchy. No clipping or unintended wrapping was found.
-- Spacing preserves the source rhythm while allowing the expanded real monitor group to use more vertical space. Desktop main width is 1000 px and header content width is 1120 px.
-- Colors map to Ant Design tokens with a white/light-gray surface system, blue actions, green healthy state, amber warning history, and accessible gray secondary text.
-- The only visible raster brand asset is the existing Elexvx Logo. It remains sharp at its displayed size and is not replaced by CSS art, emoji, or a handcrafted SVG.
-- Copy is product-specific and coherent: current health, last update, service groups, monitor cadence, history, subscription, footer, and ICP information.
+- `/tmp/elexvx-status-alignment-after.png` confirms the status card, expanded service group, row dividers, uptime values and external-link controls remain intact after the grid change.
+- Typography, colors, status semantics, image assets and copy are unchanged by this alignment-only fix.
+- The status card has no horizontal overflow at desktop or mobile viewports.
 
 **Focused-region Evidence**
 
-- A separate crop was not required because the normalized full-view comparison retains the header, alert typography, 60-day bars, row dividers, icons, and action controls at readable size.
-- Mobile-specific details were checked separately in `design/qa/status-mobile-postfix.jpg`: the subscription label is visible, the availability strips and percentages are intentionally removed from narrow group headers, monitor rows remain tappable, and there is no horizontal overflow.
+- `/tmp/elexvx-status-alignment-comparison-square.svg.png` places the marked source region and the revised bar region into one visual comparison input.
+- The reference calls for every 60-day strip to share the same left and right endpoints.
+- Browser measurements after the fix: group strip `x=477.0`, `right=1092.0`; first monitor strip `x=477.195`, `right=1091.0` at the 1280 px viewport.
+- All expanded monitor rows reuse the same grid tracks and therefore repeat the same measured endpoints.
+
+**Required Fidelity Surfaces**
+
+- Fonts and typography: unchanged Ant Design/system Chinese font stack; no new wrapping, clipping or weight drift.
+- Spacing and layout rhythm: group and monitor rows now share the same identity, availability and uptime tracks; monitor actions are isolated from those tracks.
+- Colors and visual tokens: existing healthy, warning, error and unknown semantic colors are unchanged.
+- Image quality and asset fidelity: no image or logo changes were made.
+- Copy and content: service names, cadence, percentages and navigation copy are unchanged.
 
 **Interaction and Accessibility Evidence**
 
-- Tested group expand/collapse, refresh, subscription modal open/close, history navigation, return navigation, navigation-site-to-status routing, and theme isolation.
-- Verified desktop 1440 × 900, normalized desktop 1215 × 977, and mobile 390 × 844 layouts.
-- `documentElement.scrollWidth` equals `clientWidth` at desktop and mobile sizes.
-- Browser console contained no error or warning entries from the application after the final reload.
-- Axe passes in the Playwright end-to-end suite; the page now includes a visually hidden level-one heading, semantic buttons/links, labelled status graphics, focusable controls, and mobile tap targets.
+- Tested desktop 1440 × 900 and mobile 390 × 844 through Playwright.
+- Tested group rendering, history navigation, mobile hierarchy and horizontal-overflow guards.
+- Availability strips retain their labelled `role="img"`; external service links remain keyboard accessible.
+- Axe reports zero violations in the status-page end-to-end test.
+- Browser console and page-error collection returned no application errors.
 
 **Comparison History**
 
-1. [P2] Status page inherited the navigation site's saved dark theme, diverging from the approved light status design.
-   - Fix: status routes now force Ant Design's light algorithm without overwriting the navigation site's stored theme preference.
-   - Post-fix evidence: `design/qa/status-desktop-normalized.jpg` and the combined normalized comparison.
-2. [P2] At 390 px the responsive rule hid the “订阅通知” label, leaving an ambiguous icon-only control.
-   - Fix: removed the label-hiding rule while keeping the refresh action hidden on mobile.
-   - Post-fix evidence: `design/qa/status-mobile-postfix.jpg`.
-3. [P2] Axe reported that the status page had no level-one heading.
-   - Fix: added a route-aware, visually hidden `h1` for current status and history states.
-   - Post-fix evidence: final Playwright run, 5/5 tests passed with zero Axe violations.
+1. [P2] Aggregate bars and monitor bars used different grid definitions, gaps and content padding; production measurement showed `x=461/right=1052` versus `x=454/right=1033`.
+   - Fix: corrected the Ant Design 6 collapse-body selector, unified the three content tracks, and removed the external action from the sizing grid.
+   - Post-fix evidence: `x=477/right=1092` versus `x=477.195/right=1091` in the focused local capture.
+2. [P2] The layout had no automated guard against this regression.
+   - Fix: added an end-to-end assertion requiring the aggregate and first monitor strip endpoints to remain within 1 CSS px.
+   - Post-fix evidence: 5/5 Playwright tests passed at desktop and mobile breakpoints.
 
 **Implementation Checklist**
 
-- [x] Desktop layout and visual hierarchy match the approved design direction.
-- [x] Mobile hierarchy, overflow, and tap targets verified.
-- [x] Current status, grouped monitors, 60-day availability, history, refresh, and subscription state implemented.
-- [x] Light status theme is isolated from the navigation site's persisted theme.
-- [x] SEO metadata, canonical routes, status sitemap, manifest, and Vercel host routing generated.
-- [x] Typecheck, lint, unit tests, build, Playwright/Axe, clean install, and dependency audit pass.
+- [x] Align aggregate and per-service availability strips.
+- [x] Keep uptime and external-link controls aligned.
+- [x] Preserve compact mobile rows and hide strips below 768 px.
+- [x] Add endpoint-alignment regression coverage.
+- [x] Typecheck, lint, unit tests, build, Playwright and Axe pass.
 
 **Open Questions**
 
-- None for the local implementation. Production cutover still requires the existing UptimeRobot API key to be configured in Vercel and `status.elexvx.com` to be assigned to this Vercel project.
+- None.
 
 **Follow-up Polish**
 
-- Email or Feishu incident subscription delivery can be connected later; the current control transparently reports that the channel is not yet active.
+- None required for this scope.
 
 final result: passed

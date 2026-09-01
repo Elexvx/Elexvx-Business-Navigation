@@ -100,6 +100,7 @@ function MonitorRow({ monitor }: { monitor: StatusMonitor }) {
         <Tooltip title="打开服务">
           <Button
             aria-label={`打开${monitorDisplayName(monitor.name)}`}
+            className={styles.monitorAction}
             href={monitor.url}
             icon={<ExportOutlined />}
             rel="noopener noreferrer"

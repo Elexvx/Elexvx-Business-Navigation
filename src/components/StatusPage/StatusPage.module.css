@@ -84,7 +84,7 @@
   min-width: 0;
 }
 
-.statusCollapse :global(.ant-collapse-content-box) {
+.statusCollapse :global(.ant-collapse-body) {
   padding: 0 24px 18px !important;
 }
 
@@ -179,12 +179,13 @@
 }
 
 .monitorRow {
+  position: relative;
   display: grid;
   min-height: 64px;
   align-items: center;
-  grid-template-columns: minmax(190px, 1fr) minmax(240px, 1.5fr) 80px 32px;
-  gap: 12px;
-  padding: 12px 14px;
+  grid-template-columns: minmax(190px, 1fr) minmax(240px, 1.5fr) 82px;
+  gap: 18px;
+  padding: 12px 24px 12px 0;
   border-bottom: 1px solid var(--ant-color-border-secondary);
 }
 
@@ -203,6 +204,11 @@
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.monitorAction {
+  position: absolute;
+  inset-inline-end: -1px;
 }
 
 .historyAction {
@@ -302,7 +308,7 @@
     padding: 14px 16px !important;
   }
 
-  .statusCollapse :global(.ant-collapse-content-box) {
+  .statusCollapse :global(.ant-collapse-body) {
     padding: 0 16px 14px !important;
   }
 
@@ -329,7 +335,12 @@
 
   .monitorRow {
     grid-template-columns: 1fr 28px;
+    gap: 12px;
     padding-inline: 12px;
+  }
+
+  .monitorAction {
+    position: static;
   }
 
   .monitorUptime {
