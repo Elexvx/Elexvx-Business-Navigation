@@ -34,18 +34,28 @@ export interface AppShellProps {
   selectedNavigationKey?: string;
 }
 
-function Brand({ compact = false, href }: { compact?: boolean; href: string }) {
+function Brand({
+  compact = false,
+  href,
+  showText = true,
+}: {
+  compact?: boolean;
+  href: string;
+  showText?: boolean;
+}) {
   return (
     <a className={`app-shell-brand${compact ? ' app-shell-brand-compact' : ''}`} href={href}>
       <img src={siteConfig.site.logo} alt={`${siteConfig.site.name} Logo`} />
-      <div>
-        <Typography.Text className="app-shell-brand-name" strong>
-          {siteConfig.site.name}
-        </Typography.Text>
-        <Typography.Text className="app-shell-brand-short-name" type="secondary">
-          {siteConfig.site.shortName}
-        </Typography.Text>
-      </div>
+      {showText ? (
+        <div>
+          <Typography.Text className="app-shell-brand-name" strong>
+            {siteConfig.site.name}
+          </Typography.Text>
+          <Typography.Text className="app-shell-brand-short-name" type="secondary">
+            {siteConfig.site.shortName}
+          </Typography.Text>
+        </div>
+      ) : null}
     </a>
   );
 }
@@ -119,7 +129,7 @@ export function AppShell({
               type="text"
             />
           ) : null}
-          <Brand compact={!isDesktop} href={navigationHref} />
+          <Brand compact={!isDesktop} href={navigationHref} showText={false} />
         </div>
 
         {isDesktop ? (

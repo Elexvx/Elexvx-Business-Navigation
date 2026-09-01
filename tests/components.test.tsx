@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -88,5 +88,20 @@ describe('navigation components', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(menuButton).toHaveFocus();
+  });
+
+  it('keeps the header brand as a logo-only link', () => {
+    renderWithProviders(
+      <AppShell
+        navigation={siteConfig.navigation}
+        searchPanel={<SearchPanel />}
+        dashboard={<NavigationDashboard />}
+      />,
+    );
+
+    const header = screen.getByRole('banner');
+    expect(within(header).getByAltText(`${siteConfig.site.name} Logo`)).toBeVisible();
+    expect(within(header).queryByText(siteConfig.site.name)).not.toBeInTheDocument();
+    expect(within(header).queryByText(siteConfig.site.shortName)).not.toBeInTheDocument();
   });
 });

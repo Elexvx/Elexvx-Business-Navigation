@@ -1,69 +1,68 @@
-# 服务状态子级缩进设计验收
+# 顶部品牌文字移除设计验收
 
 **Findings**
 
 - 当前没有遗留的 P0、P1 或 P2 设计问题。
-- 分组标题保持原始基线，组内服务的状态点与文字建立清晰的子级缩进，状态条、百分比和操作列均未移动。
+- 用户标注的 Logo 右侧“宏翔商道 / 企业导航”文字块已移除，只保留原品牌 Logo；导航菜单自然向左衔接，没有遗留空白占位。
 
 **Comparison Target**
 
-- Source visual truth: `/tmp/elexvx-status-indent-before.png`
-- Implementation screenshot: `/tmp/elexvx-status-indent-after.png`
-- Combined comparison: `/tmp/elexvx-status-indent-comparison.svg.png`
-- Mobile implementation screenshot: `/tmp/elexvx-status-indent-mobile-after.png`
-- Route/state: `/status`, light theme, first service group expanded.
+- Source visual truth: `/tmp/elexvx-brand-text-before.png`
+- Implementation screenshot: `/tmp/elexvx-brand-text-after-matched.png`
+- Combined comparison: `/tmp/elexvx-brand-text-comparison.svg.png`
+- Route/state: `/#category-政务链接`, dark theme, desktop navigation visible.
 
 **Viewport and Normalization**
 
-- Desktop source and implementation viewport: 1280 × 720.
-- Mobile implementation viewport: 390 × 844.
-- Source and implementation were captured from the same local route and data state; only the update timestamp changed between captures.
+- Source and implementation were captured in the same in-app Browser tab.
+- Source and implementation pixel dimensions: 1265 × 712.
+- CSS viewport and device density were unchanged between captures; no scaling or density conversion was required.
 
 **Full-view Comparison Evidence**
 
-- Before: “企业服务”和组内“企业官网”文字起点分别为 x=69px、x=70px，层级视觉上基本齐平。
-- After: 分组文字仍为 x=69px，组内服务文字移动到 x=94px，形成 25px 的可见层级差。
-- 分组状态条仍从 x=347px 开始，服务状态条仍从 x=348px 开始；左右端点保持对齐。
-- 桌面端与移动端均没有横向溢出。
+- 页面主体、搜索区、分类列表、主题状态和滚动位置保持一致。
+- 唯一可见变化集中在顶部品牌区域：两行文字消失，Logo、导航菜单和主题按钮继续保持同一垂直基线。
+- 导航菜单向左补位，未出现大块空白，也没有遮挡 Logo 或首个导航项。
 
 **Focused-region Evidence**
 
-- `/tmp/elexvx-status-indent-comparison.svg.png` 将修复前后放入同一比较输入。
-- 子级身份区域只增加内侧缩进，没有改变共享的 280px 身份列，也没有挤压状态历史条。
-- 移动端使用 12px 内部缩进；实际分组与子级文字起点差为 25px，兼顾层级和窄屏空间。
+- `/tmp/elexvx-brand-text-comparison.svg.png` 将同一视口、同一主题下的修改前后页面放入一个比较输入。
+- 修改前：Logo 后存在两行品牌文字，随后才进入“企业系统”菜单。
+- 修改后：Logo 后直接进入“企业系统”菜单，符合用户标注的删除目标。
 
 **Required Fidelity Surfaces**
 
-- Fonts and typography: 字体、字号、字重及单行截断规则保持不变。
-- Spacing and layout rhythm: 桌面子级内缩 24px，移动端子级内缩 12px；行高、分隔线和卡片节奏不变。
-- Colors and visual tokens: 健康、警告、异常和未知状态颜色不变。
-- Image quality and asset fidelity: 本次不涉及图片或品牌资产修改。
-- Copy and content: 服务名称、检测说明、可用率与状态数据不变。
+- Fonts and typography: 仅删除指定品牌文字；导航、标题、卡片文字的字体、字号和字重均不变。
+- Spacing and layout rhythm: Header 高度、Logo 尺寸、菜单项间距和主题按钮位置不变；菜单自动回收删除后的空间。
+- Colors and visual tokens: 明暗主题颜色及选中态颜色不变。
+- Image quality and asset fidelity: 继续使用原始 Elexvx Logo，没有替换或重绘品牌资产。
+- Copy and content: 只移除 Header 中被标注的两行文字；SEO 标题、页脚版权和 Drawer 品牌上下文保持不变。
 
 **Interaction and Accessibility Evidence**
 
-- 桌面 1440 × 900 与移动 390 × 844 状态页端到端检查通过。
-- 状态条标签、展开分组、历史页面入口和外部链接行为保持不变。
-- Axe 无违规；桌面和移动端均无横向溢出。
-- 新增回归断言要求子级名称相对分组名称缩进 20–30px，并继续验证分组/服务状态条端点对齐。
+- Logo 链接继续存在，并保留“宏翔商道 Logo”替代文本。
+- Header 内“宏翔商道”和“企业导航”的可见节点数量均为 0；Logo 和首个菜单项各保留 1 个。
+- 页面导航、搜索、主题切换和分类内容均保持工作状态。
+- 修改后浏览器控制台无 error 或 warning。
+- TypeScript、ESLint、组件测试和生产构建通过。
 
 **Comparison History**
 
-1. [P2] 分组标题与组内服务文字几乎处于同一水平起点，无法清楚表达父子层级。
-   - Fix: 只对 `.monitorIdentity` 增加桌面 24px、移动 12px 的内侧缩进。
-   - Post-fix evidence: 桌面文字起点差从 1px 增加到 25px，状态条坐标保持不变。
-2. [P2] 若直接缩进整行，会破坏之前验收通过的状态条对齐。
-   - Fix: 缩进限定在身份单元内部，并保留 280px 网格列宽。
-   - Post-fix evidence: 分组与服务状态条左右端点偏差仍不超过 1px。
+1. [P2] Logo 右侧仍显示用户要求删除的两行品牌文字。
+   - Fix: 为共享 Brand 组件增加 `showText` 控制，仅让顶部 Header 使用 Logo-only 模式。
+   - Post-fix evidence: 同视口比较显示两行文字完全移除，菜单正常向左补位。
+2. [P2] 若直接删除共享 Brand 的文字，移动 Drawer 标题也会失去品牌说明。
+   - Fix: Drawer 继续使用默认文字版 Brand，只在 Header 关闭文字。
+   - Post-fix evidence: 组件结构与现有 Drawer 关闭/焦点恢复行为保持不变。
 
 **Implementation Checklist**
 
-- [x] 分组标题保持原位。
-- [x] 组内服务状态点和文字统一缩进。
-- [x] 状态条、百分比和操作列保持对齐。
-- [x] 移动端使用更紧凑的层级缩进。
-- [x] 增加层级缩进回归测试。
-- [x] 视觉比较与无溢出检查通过。
+- [x] 移除顶部 Logo 右侧的两行文字。
+- [x] 保留 Logo 链接和替代文本。
+- [x] 回收文字占用空间，让导航菜单自然衔接。
+- [x] 保留 Drawer 中必要的品牌上下文。
+- [x] 增加组件与端到端回归断言。
+- [x] 完成同视口视觉比较和浏览器控制台检查。
 
 **Open Questions**
 

@@ -32,6 +32,8 @@ test('desktop renders the complete six-category navigation without overflow', as
 
   await expect(page).toHaveTitle(/宏翔商道/);
   await expect(page.locator('.app-shell-header-menu')).toBeVisible();
+  await expect(page.locator('.app-shell-header').getByText('宏翔商道', { exact: true })).toHaveCount(0);
+  await expect(page.locator('.app-shell-header').getByText('企业导航', { exact: true })).toHaveCount(0);
   await expect(page.locator('main a[target="_blank"]')).toHaveCount(33);
   await expect(page.locator('[id^="category-"]')).toHaveCount(6);
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
