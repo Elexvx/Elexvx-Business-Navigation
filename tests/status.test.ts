@@ -19,6 +19,7 @@ import {
   resetStatusCacheForTests,
 } from '../server/status/uptimeRobot';
 import type { StatusMonitor } from '../src/types/status';
+import { resolveStatusDomainEntry } from '../server/routing/statusDomain';
 
 function monitor(overrides: Partial<StatusMonitor>): StatusMonitor {
   return {
@@ -54,6 +55,13 @@ describe('status routing and aggregation', () => {
     expect(statusHistoryHref('nav.elexvx.com')).toBe('/status/history');
     expect(navigationHomeHref('status.elexvx.com')).toBe('https://nav.elexvx.com/');
     expect(navigationHomeHref('nav.elexvx.com')).toBe('/');
+  });
+
+  it('rewrites only status-domain entry routes to the dedicated status document', () => {
+    expect(resolveStatusDomainEntry(new URL('https://status.elexvx.com/'))).toBe('/status.html');
+    expect(resolveStatusDomainEntry(new URL('https://status.elexvx.com/history'))).toBe('/status.html');
+    expect(resolveStatusDomainEntry(new URL('https://nav.elexvx.com/'))).toBeUndefined();
+    expect(resolveStatusDomainEntry(new URL('https://status.elexvx.com/api/status'))).toBeUndefined();
   });
 
   it('groups monitors by configured prefix and derives aggregate status', () => {

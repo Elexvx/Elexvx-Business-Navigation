@@ -33,12 +33,7 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "status.elexvx.com" }],
-      "destination": "/status"
-    },
-    { "source": "/history", "destination": "/status" },
-    { "source": "/status/history", "destination": "/status" }
+    { "source": "/history", "destination": "/status.html" },
+    { "source": "/status/history", "destination": "/status.html" }
   ]
 }
