@@ -1,5 +1,6 @@
 import {
   AppstoreOutlined,
+  DashboardOutlined,
   FolderOpenOutlined,
 } from '@ant-design/icons';
 import { Menu } from 'antd';
@@ -47,7 +48,8 @@ export function NavigationMenu({
 }: NavigationMenuProps) {
   const items = useMemo<MenuProps['items']>(
     () =>
-      navigation.map((category) => {
+      [
+        ...navigation.map((category) => {
         const categoryKey = navigationKeyForCategory(category);
         const categoryAnchor = categoryAnchorId(category);
 
@@ -77,7 +79,13 @@ export function NavigationMenu({
             onNavigationComplete?.();
           },
         };
-      }),
+        }),
+        {
+          key: 'service-status',
+          icon: mode === 'inline' ? <DashboardOutlined /> : undefined,
+          label: <a href="/status">服务状态</a>,
+        },
+      ],
     [mode, navigation, onNavigate, onNavigationComplete],
   );
 

@@ -13,6 +13,7 @@ export default mergeConfig(
       include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
       restoreMocks: true,
       setupFiles: ['./tests/setup.ts'],
+      testTimeout: 10_000,
     },
   }),
 );

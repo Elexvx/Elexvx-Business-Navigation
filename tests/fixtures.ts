@@ -67,5 +67,13 @@ export const fixtureSiteConfig: SiteConfig = {
     maxSuggestions: 5,
     engines: [fixtureEngine()],
   },
+  status: {
+    url: 'https://status.example.com',
+    title: 'Fixture Status',
+    description: 'Fixture status description',
+    historyDays: 60,
+    refreshIntervalSeconds: 300,
+    groups: [{ id: 'services', name: 'Services', prefixes: ['A'] }],
+  },
   navigation: fixtureNavigation,
 };

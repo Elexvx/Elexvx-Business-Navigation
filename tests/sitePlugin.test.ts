@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildSeoArtifacts, buildSeoHead } from '../src/config/sitePlugin';
+import { buildSeoArtifacts, buildSeoHead, buildStatusSeoHead } from '../src/config/sitePlugin';
 import { fixtureSiteConfig } from './fixtures';
 
 describe('SEO generation', () => {
@@ -32,10 +32,11 @@ describe('SEO generation', () => {
   it('generates robots, sitemap and manifest from the same site config', () => {
     const artifacts = buildSeoArtifacts(fixtureSiteConfig);
 
-    expect(artifacts.robots).toBe(
-      'User-agent: *\nAllow: /\n\nSitemap: https://example.com/sitemap.xml\n',
-    );
+    expect(artifacts.robots).toContain('Sitemap: https://example.com/sitemap.xml');
+    expect(artifacts.robots).toContain('Sitemap: https://status.example.com/status-sitemap.xml');
     expect(artifacts.sitemap).toContain('<loc>https://example.com/</loc>');
+    expect(artifacts.statusSitemap).toContain('<loc>https://status.example.com/</loc>');
+    expect(artifacts.statusSitemap).toContain('<loc>https://status.example.com/history</loc>');
     expect(artifacts.sitemap).not.toContain('<changefreq>');
 
     const manifest = JSON.parse(artifacts.manifest) as {
@@ -48,5 +49,18 @@ describe('SEO generation', () => {
       expect.objectContaining({ sizes: '192x192', type: 'image/png', purpose: 'any' }),
       expect.objectContaining({ sizes: '512x512', type: 'image/png', purpose: 'any' }),
     ]);
+
+    const statusManifest = JSON.parse(artifacts.statusManifest) as { name: string; start_url: string };
+    expect(statusManifest).toMatchObject({ name: 'Fixture Status', start_url: '/' });
+  });
+
+  it('builds independent status metadata with the status-domain canonical URL', () => {
+    const head = buildStatusSeoHead(fixtureSiteConfig);
+    expect(head).toContain('<title>Fixture Status</title>');
+    expect(head).toContain('<link rel="canonical" href="https://status.example.com/" />');
+    expect(head).toContain('property="og:image" content="https://status.example.com/og-image.png"');
+    expect(head).toContain('property="og:image:width" content="1200"');
+    expect(head).toContain('name="twitter:image:alt"');
+    expect(head).toContain('href="/status.webmanifest"');
   });
 });

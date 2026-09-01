@@ -160,3 +160,53 @@ test('theme preference and both search modes persist and stub external tabs', as
   await page.reload();
   await expect(page.getByRole('button', { name: '切换到浅色模式' })).toBeVisible();
 });
+
+test('status page matches the compact desktop design and exposes working history', async ({ page }) => {
+  const consoleErrors: string[] = [];
+  page.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
+  page.on('pageerror', (error) => consoleErrors.push(error.message));
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/status');
+
+  await expect(page).toHaveTitle('宏翔商道服务状态');
+  await expect(page.getByText('所有系统运行正常')).toBeVisible();
+  await expect(page.getByText('系统状态')).toBeVisible();
+  await expect(page.getByText('企业服务', { exact: true })).toBeVisible();
+  await expect(page.getByText('项目服务', { exact: true })).toBeVisible();
+  await expect(page.getByText('公共服务', { exact: true })).toBeVisible();
+  await expect(page.getByText('企业官网', { exact: true })).toBeVisible();
+
+  const hasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+  expect(consoleErrors).toEqual([]);
+
+  const accessibility = await new AxeBuilder({ page }).analyze();
+  expect(accessibility.violations).toEqual([]);
+
+  await page.getByRole('link', { name: /查看历史记录/ }).click();
+  await expect(page).toHaveURL(/\/status\/history$/);
+  await expect(page.getByText('历史可用性')).toBeVisible();
+});
+
+test('status page keeps the mobile hierarchy compact without horizontal overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/status');
+
+  await expect(page.getByText('所有系统运行正常')).toBeVisible();
+  await expect(page.getByText('企业服务', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('企业服务最近 60 天可用性')).toBeHidden();
+  await expect(page.getByText('企业官网', { exact: true })).toBeVisible();
+
+  const hasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+
+  await page.getByRole('button', { name: /订阅通知/ }).click();
+  await expect(page.getByRole('dialog', { name: '订阅服务通知' })).toBeVisible();
+});

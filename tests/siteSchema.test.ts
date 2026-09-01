@@ -25,6 +25,11 @@ const minimalConfig = {
       },
     ],
   },
+  status: {
+    url: 'https://status.example.com',
+    description: '状态测试',
+    groups: [{ name: '企业服务', prefixes: ['a'] }],
+  },
   navigation: [
     {
       category: '分类',
@@ -48,6 +53,12 @@ describe('site configuration schema', () => {
       id: '链接',
       status: 'available',
       tags: [],
+    });
+    expect(config.status).toMatchObject({
+      url: 'https://status.example.com',
+      historyDays: 60,
+      refreshIntervalSeconds: 300,
+      groups: [{ id: '企业服务', prefixes: ['A'] }],
     });
     expect(flattenNavigationLinks(config.navigation)).toHaveLength(1);
   });

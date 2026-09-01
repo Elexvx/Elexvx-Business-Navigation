@@ -68,10 +68,26 @@ export interface SearchConfig {
   engines: SearchEngine[];
 }
 
+export interface StatusGroupConfig {
+  id: string;
+  name: string;
+  prefixes: string[];
+}
+
+export interface StatusConfig {
+  url: string;
+  title: string;
+  description: string;
+  historyDays: number;
+  refreshIntervalSeconds: number;
+  groups: StatusGroupConfig[];
+}
+
 export interface SiteConfig {
   site: SiteMetadata;
   seo: SeoConfig;
   search: SearchConfig;
+  status: StatusConfig;
   navigation: NavigationCategory[];
 }
 

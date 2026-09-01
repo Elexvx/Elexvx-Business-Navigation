@@ -9,6 +9,7 @@ import type {
   NavigationSubcategory,
   SearchEngine,
   SiteConfig,
+  StatusGroupConfig,
 } from '../types/site.ts';
 
 export const linkStatuses = [
@@ -111,10 +112,26 @@ const rawSearchSchema = z.object({
   engines: z.array(rawSearchEngineSchema).min(1),
 });
 
+const rawStatusGroupSchema = z.object({
+  id: idSchema.optional(),
+  name: nonEmptyString,
+  prefixes: z.array(nonEmptyString).min(1),
+});
+
+const rawStatusSchema = z.object({
+  url: urlSchema,
+  title: nonEmptyString.default('服务状态'),
+  description: nonEmptyString,
+  historyDays: z.number().int().min(7).max(90).default(60),
+  refreshIntervalSeconds: z.number().int().min(60).max(3600).default(300),
+  groups: z.array(rawStatusGroupSchema).min(1),
+});
+
 export const siteConfigSchema = z.object({
   site: rawSiteSchema,
   seo: rawSeoSchema,
   search: rawSearchSchema,
+  status: rawStatusSchema,
   navigation: z.array(rawCategorySchema).min(1),
 });
 
@@ -169,6 +186,17 @@ function normalizeCategory(category: z.infer<typeof rawCategorySchema>, index: n
     category: category.category,
     links: category.links.map(normalizeLink),
     subcategories: category.subcategories.map(normalizeSubcategory),
+  };
+}
+
+function normalizeStatusGroup(
+  group: z.infer<typeof rawStatusGroupSchema>,
+  index: number,
+): StatusGroupConfig {
+  return {
+    id: group.id ?? toStableId(group.name, `status-group-${index + 1}`),
+    name: group.name,
+    prefixes: group.prefixes.map((prefix) => prefix.toLocaleUpperCase()),
   };
 }
 
@@ -252,6 +280,23 @@ function validateNormalizedConfig(config: SiteConfig, options: NormalizeOptions)
       `配置校验失败：search.defaultEngine 引用了不存在的搜索引擎: ${config.search.defaultEngine}`,
     );
   }
+
+  assertUnique(
+    config.status.groups.map((group, index) => ({
+      value: group.id,
+      path: ['status', 'groups', index, 'id'],
+    })),
+    '状态分组 ID',
+  );
+  assertUnique(
+    config.status.groups.flatMap((group, groupIndex) =>
+      group.prefixes.map((prefix, prefixIndex) => ({
+        value: prefix,
+        path: ['status', 'groups', groupIndex, 'prefixes', prefixIndex],
+      })),
+    ),
+    '状态分组前缀',
+  );
 
   if (options.validateAssets !== false && options.root) {
     const localAssets: Array<{ value: string; path: PropertyKey[] }> = [];
@@ -345,6 +390,14 @@ export function parseSiteConfig(raw: unknown, options: NormalizeOptions = {}): S
       showEngineSelector: source.search.showEngineSelector,
       maxSuggestions: source.search.maxSuggestions,
       engines,
+    },
+    status: {
+      url: source.status.url.replace(/\/+$/, ''),
+      title: source.status.title,
+      description: source.status.description,
+      historyDays: source.status.historyDays,
+      refreshIntervalSeconds: source.status.refreshIntervalSeconds,
+      groups: source.status.groups.map(normalizeStatusGroup),
     },
     navigation,
   };

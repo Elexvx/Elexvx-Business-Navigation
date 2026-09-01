@@ -149,16 +149,72 @@ export function buildSeoHead(config: SiteConfig): string {
   `.trim();
 }
 
+export function buildStatusSeoHead(config: SiteConfig): string {
+  const canonicalUrl = new URL('/', `${config.status.url}/`).href;
+  const imageUrl = new URL(config.seo.defaultImage, canonicalUrl).href;
+  const title = config.status.title;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: title,
+    url: canonicalUrl,
+    description: config.status.description,
+    inLanguage: config.site.language,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: config.site.name,
+      url: getCanonicalUrl(config),
+    },
+  };
+
+  return `
+    <title>${escapeAttribute(title)}</title>
+    <meta name="description" content="${escapeAttribute(config.status.description)}" />
+    <meta name="author" content="${escapeAttribute(config.site.author)}" />
+    <meta name="application-name" content="${escapeAttribute(title)}" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="${escapeAttribute(canonicalUrl)}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/status.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/status-sitemap.xml" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#182235" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="${escapeAttribute(title)}" />
+    <meta property="og:description" content="${escapeAttribute(config.status.description)}" />
+    <meta property="og:url" content="${escapeAttribute(canonicalUrl)}" />
+    <meta property="og:site_name" content="${escapeAttribute(config.site.name)}" />
+    <meta property="og:locale" content="${escapeAttribute(config.site.locale)}" />
+    <meta property="og:image" content="${escapeAttribute(imageUrl)}" />
+    <meta property="og:image:secure_url" content="${escapeAttribute(imageUrl)}" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="${escapeAttribute(`${config.site.name}服务状态分享图`)}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${escapeAttribute(title)}" />
+    <meta name="twitter:description" content="${escapeAttribute(config.status.description)}" />
+    <meta name="twitter:image" content="${escapeAttribute(imageUrl)}" />
+    <meta name="twitter:image:alt" content="${escapeAttribute(`${config.site.name}服务状态分享图`)}" />
+    <script type="application/ld+json">${escapeJson(structuredData)}</script>
+  `.trim();
+}
+
 export interface SeoArtifacts {
   robots: string;
   sitemap: string;
   manifest: string;
+  statusSitemap: string;
+  statusManifest: string;
 }
 
 export function buildSeoArtifacts(config: SiteConfig): SeoArtifacts {
   const canonicalUrl = getCanonicalUrl(config);
-  const robots = `User-agent: *\nAllow: /\n\nSitemap: ${canonicalUrl}sitemap.xml\n`;
+  const statusUrl = new URL('/', `${config.status.url}/`).href;
+  const robots = `User-agent: *\nAllow: /\n\nSitemap: ${canonicalUrl}sitemap.xml\nSitemap: ${statusUrl}status-sitemap.xml\n`;
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${escapeXml(canonicalUrl)}</loc>\n  </url>\n</urlset>\n`;
+  const statusSitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${escapeXml(statusUrl)}</loc>\n  </url>\n  <url>\n    <loc>${escapeXml(`${statusUrl}history`)}</loc>\n  </url>\n</urlset>\n`;
   const manifest = `${JSON.stringify(
     {
       id: '/',
@@ -191,7 +247,29 @@ export function buildSeoArtifacts(config: SiteConfig): SeoArtifacts {
     2,
   )}\n`;
 
-  return { robots, sitemap, manifest };
+  const statusManifest = `${JSON.stringify(
+    {
+      id: '/',
+      name: config.status.title,
+      short_name: '服务状态',
+      description: config.status.description,
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      background_color: '#ffffff',
+      theme_color: '#1557d6',
+      lang: config.site.language,
+      categories: ['business', 'productivity', 'utilities'],
+      icons: [
+        { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      ],
+    },
+    null,
+    2,
+  )}\n`;
+
+  return { robots, sitemap, manifest, statusSitemap, statusManifest };
 }
 
 export function siteConfigPlugin(): Plugin {
@@ -222,6 +300,10 @@ export function siteConfigPlugin(): Plugin {
               ? { content: artifacts.sitemap, contentType: 'application/xml; charset=utf-8' }
               : pathname === '/site.webmanifest'
                 ? { content: artifacts.manifest, contentType: 'application/manifest+json; charset=utf-8' }
+                : pathname === '/status-sitemap.xml'
+                  ? { content: artifacts.statusSitemap, contentType: 'application/xml; charset=utf-8' }
+                  : pathname === '/status.webmanifest'
+                    ? { content: artifacts.statusManifest, contentType: 'application/manifest+json; charset=utf-8' }
                 : undefined;
 
         if (!asset) {
@@ -238,7 +320,9 @@ export function siteConfigPlugin(): Plugin {
     transformIndexHtml(html: string, _ctx: IndexHtmlTransformContext) {
       const root = resolvedConfig?.root ?? process.cwd();
       const config = loadSiteConfig(root);
-      const head = buildSeoHead(config);
+      const head = _ctx.filename.endsWith('status.html')
+        ? buildStatusSeoHead(config)
+        : buildSeoHead(config);
       const withLanguage = html.replace(
         /(<html\b[^>]*\blang=)(["'])[^"']*\2/i,
         (_match, prefix: string) => `${prefix}"${escapeAttribute(config.site.language)}"`,
@@ -254,6 +338,8 @@ export function siteConfigPlugin(): Plugin {
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: artifacts.robots });
       this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: artifacts.sitemap });
       this.emitFile({ type: 'asset', fileName: 'site.webmanifest', source: artifacts.manifest });
+      this.emitFile({ type: 'asset', fileName: 'status-sitemap.xml', source: artifacts.statusSitemap });
+      this.emitFile({ type: 'asset', fileName: 'status.webmanifest', source: artifacts.statusManifest });
     },
     handleHotUpdate(context) {
       const root = resolvedConfig?.root ?? process.cwd();

@@ -48,6 +48,13 @@ select {
   min-height: 100vh;
 }
 
+.route-loading {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  background: var(--ant-color-bg-layout);
+}
+
 .app-shell {
   min-height: 100vh;
   background: var(--ant-color-bg-layout);

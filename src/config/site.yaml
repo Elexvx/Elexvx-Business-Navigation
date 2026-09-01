@@ -25,6 +25,23 @@ seo:
     - 人工智能
     - 公众平台
 
+status:
+  url: https://status.elexvx.com
+  title: 宏翔商道服务状态
+  description: 实时查看宏翔商道企业服务、项目服务与公共服务的运行状态和历史可用率。
+  historyDays: 60
+  refreshIntervalSeconds: 300
+  groups:
+    - name: 企业服务
+      prefixes:
+        - A
+    - name: 项目服务
+      prefixes:
+        - B
+    - name: 公共服务
+      prefixes:
+        - J
+
 search:
   defaultEngine: bing
   enabledEngines:

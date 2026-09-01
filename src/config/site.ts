@@ -16,4 +16,6 @@ export type {
   SeoConfig,
   SiteConfig,
   SiteMetadata,
+  StatusConfig,
+  StatusGroupConfig,
 } from '../types/site';
