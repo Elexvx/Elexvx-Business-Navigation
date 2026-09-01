@@ -42,3 +42,7 @@ Thumbs.db
 *.tmp
 .cache/
 
+# browser and test reports
+test-results/
+playwright-report/
+coverage/

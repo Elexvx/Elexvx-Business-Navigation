@@ -1,319 +1,88 @@
-# 企业导航平台 / Enterprise Navigation Platform
+# 宏翔商道企业导航
 
-[中文](#中文文档) | [English](#english-documentation)
+宏翔商道企业服务导航是一个静态 React 单页应用，为团队提供统一的企业系统、政务、知识产权、信用、AI 与公众平台入口。
 
----
+## 技术栈
 
-## 中文文档
+- React 19 + TypeScript
+- Vite 8
+- Ant Design 6 + `@ant-design/icons`
+- YAML + Zod：内容维护与构建时配置校验
+- Vitest + Testing Library：单元和组件测试
+- Playwright + axe：浏览器回归与无障碍测试
 
-### 📋 项目简介
+项目不依赖 Astro、Tailwind、React Router 或后端服务；Vercel 直接部署 Vite 的 `dist` 静态产物。
 
-企业导航平台是一个基于 Astro 框架开发的现代化导航网站，专为企业内部工具和资源管理而设计。平台提供了直观的分类导航、智能搜索、响应式设计和丰富的动画效果，帮助团队快速访问常用工具和资源。
+## 本地开发
 
-### ✨ 核心特性
-
-- **🎨 现代化设计**：采用 Tailwind CSS，支持暗色模式，具有精美的动画效果
-- **📱 响应式布局**：完美适配桌面端、平板和移动设备
-- **🔍 智能导航**：侧边栏分类导航，支持手风琴展开/收起效果
-- **⚡ 高性能**：基于 Astro 静态生成，加载速度极快
-- **🎯 锚点跳转**：支持平滑滚动到指定分类和子分类
-- **📊 实时统计**：显示链接总数、分类数量和网站状态
-- **🌐 SEO 优化**：完整的 meta 标签和结构化数据
-- **♿ 无障碍访问**：遵循 WCAG 标准，支持键盘导航
-
-### 🚀 快速开始
-
-#### 环境要求
-
-- Node.js >= 18.0.0
-- npm 或 yarn 包管理器
-
-#### 安装步骤
-
-1. **克隆项目**
-   ```bash
-   git clone <repository-url>
-   cd nav
-   ```
-
-2. **安装依赖**
-   ```bash
-   npm install
-   ```
-
-3. **启动开发服务器**
-   ```bash
-   npm run dev
-   ```
-
-4. **访问应用**
-   
-   打开浏览器访问 `http://localhost:4321`
-
-#### 构建部署
+环境要求：Node.js `>=20.19.0`、npm。
 
 ```bash
-# 构建生产版本
-npm run build
-
-# 预览构建结果
-npm run preview
-
-# 类型检查
-npm run astro:check
+npm ci
+npm run dev
 ```
 
-### 📁 项目结构
-
-```
-src/
-├── components/          # 组件目录
-│   ├── Sidebar.astro    # 侧边栏导航组件
-│   ├── MobileNav.astro  # 移动端导航
-│   ├── SearchBox.astro  # 搜索框组件
-│   └── SEOHead.astro    # SEO 头部组件
-├── config/              # 配置文件
-│   ├── links.ts         # 导航链接配置
-│   ├── seo.ts          # SEO 配置
-│   └── search.ts       # 搜索配置
-├── layouts/             # 布局模板
-│   └── Layout.astro     # 主布局模板
-├── pages/               # 页面文件
-│   └── index.astro      # 首页
-└── styles/              # 样式文件
-    └── global.css       # 全局样式
-```
-
-### ⚙️ 配置说明
-
-#### 添加新的导航链接
-
-编辑 `src/config/links.ts` 文件：
-
-```typescript
-export const navigation: NavigationCategory[] = [
-  {
-    category: "开发工具",
-    subcategories: [
-      {
-        name: "代码编辑器",
-        links: [
-          {
-            name: "VS Code",
-            url: "https://code.visualstudio.com",
-            description: "微软开发的免费代码编辑器"
-          }
-        ]
-      }
-    ]
-  }
-];
-```
-
-#### 修改 SEO 配置
-
-编辑 `src/config/seo.ts` 文件：
-
-```typescript
-export const siteConfig = {
-  title: "企业导航平台",
-  description: "专业的企业级工具和资源导航平台",
-  url: "https://your-domain.com",
-  // ... 其他配置
-};
-```
-
-### 🎨 自定义样式
-
-项目使用 Tailwind CSS 进行样式管理，你可以：
-
-1. **修改主题色彩**：编辑 `tailwind.config.cjs`
-2. **添加自定义动画**：在组件中添加 CSS `@keyframes`
-3. **调整响应式断点**：修改 Tailwind 配置
-
-### 📱 移动端适配
-
-- 自动检测设备类型
-- 移动端显示汉堡菜单
-- 触摸友好的交互设计
-- 优化的字体大小和间距
-
-### 🔧 开发工具
-
-- **ESLint**：代码质量检查
-- **Prettier**：代码格式化
-- **TypeScript**：类型安全
-- **Astro Check**：Astro 特定的类型检查
-
-### 📈 性能优化
-
-- 静态站点生成 (SSG)
-- 图片自动优化
-- CSS 和 JS 代码分割
-- 预加载关键资源
-- 最小化运行时 JavaScript
-
----
-
-## English Documentation
-
-### 📋 Project Overview
-
-Enterprise Navigation Platform is a modern navigation website built with Astro framework, designed specifically for enterprise internal tools and resource management. The platform provides intuitive categorized navigation, intelligent search, responsive design, and rich animation effects to help teams quickly access commonly used tools and resources.
-
-### ✨ Key Features
-
-- **🎨 Modern Design**: Built with Tailwind CSS, supports dark mode with beautiful animations
-- **📱 Responsive Layout**: Perfect adaptation for desktop, tablet, and mobile devices
-- **🔍 Smart Navigation**: Sidebar category navigation with accordion expand/collapse effects
-- **⚡ High Performance**: Based on Astro static generation for extremely fast loading
-- **🎯 Anchor Navigation**: Supports smooth scrolling to specific categories and subcategories
-- **📊 Real-time Statistics**: Displays total links, category count, and website status
-- **🌐 SEO Optimized**: Complete meta tags and structured data
-- **♿ Accessibility**: Follows WCAG standards with keyboard navigation support
-
-### 🚀 Quick Start
-
-#### Requirements
-
-- Node.js >= 18.0.0
-- npm or yarn package manager
-
-#### Installation
-
-1. **Clone the project**
-   ```bash
-   git clone <repository-url>
-   cd nav
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Access the application**
-   
-   Open your browser and visit `http://localhost:4321`
-
-#### Build & Deploy
+开发服务器地址为 <http://127.0.0.1:4321/>。构建产物可以用下面的命令预览：
 
 ```bash
-# Build for production
 npm run build
-
-# Preview build
 npm run preview
-
-# Type checking
-npm run astro:check
 ```
 
-### 📁 Project Structure
+## 内容维护
 
-```
-src/
-├── components/          # Components directory
-│   ├── Sidebar.astro    # Sidebar navigation component
-│   ├── MobileNav.astro  # Mobile navigation
-│   ├── SearchBox.astro  # Search box component
-│   └── SEOHead.astro    # SEO head component
-├── config/              # Configuration files
-│   ├── links.ts         # Navigation links configuration
-│   ├── seo.ts          # SEO configuration
-│   └── search.ts       # Search configuration
-├── layouts/             # Layout templates
-│   └── Layout.astro     # Main layout template
-├── pages/               # Page files
-│   └── index.astro      # Homepage
-└── styles/              # Style files
-    └── global.css       # Global styles
-```
+`src/config/site.yaml` 是唯一的站点内容源，集中维护站点信息、SEO、搜索引擎和导航链接。修改后重新启动开发服务器或执行构建，Vite 插件会在启动和构建时用 Zod 校验：
 
-### ⚙️ Configuration
+- 分类、二级分类、链接和 URL 不能重复；
+- URL 必须是 `http` 或 `https`；
+- 搜索引擎引用必须存在且已启用；
+- 本地 Logo 和图标必须存在于 `public/`；
+- 未填写的链接 `status` 默认为 `available`，`tags` 默认为空数组，ID 会由名称生成稳定值。
 
-#### Adding New Navigation Links
+链接支持 `available`、`maintenance`、`unavailable`、`beta` 和 `deprecated` 状态。`tags` 与 `status` 保留在数据契约中，其中 `tags` 参与站内搜索，但二者都不会渲染为目录项里的标签或状态徽标。新增本地图片时，请把文件放进 `public/`，并在 YAML 中使用以 `/` 开头的路径。
 
-Edit `src/config/links.ts` file:
+## 功能约定
 
-```typescript
-export const navigation: NavigationCategory[] = [
-  {
-    category: "Development Tools",
-    subcategories: [
-      {
-        name: "Code Editors",
-        links: [
-          {
-            name: "VS Code",
-            url: "https://code.visualstudio.com",
-            description: "Free code editor developed by Microsoft"
-          }
-        ]
-      }
-    ]
-  }
-];
+- 桌面端使用 Ant Design `Layout.Header` 和横向 `Menu`；小于 `lg`（992px）时使用 `Drawer` 复用分类导航。
+- 首页使用紧凑的两列企业目录；每个入口只显示图标、名称、说明和进入箭头，不展示内容标签或状态标签。
+- 首页顶部搜索区通过搜索源下拉统一站内与全网搜索。站内搜索名称、描述和数据标签；全网搜索支持 Bing、Google、百度和 GitHub，并始终保留明确的搜索按钮。
+- 主题和搜索偏好保存在浏览器 localStorage；外链统一使用新标签页和 `noopener noreferrer`。
+- 页面只提供首页和分类 hash 锚点，不引入路由或动态 API。
+
+## 质量门禁
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run test:e2e
+npm run build
+npm audit --audit-level=high
 ```
 
-#### Modifying SEO Configuration
+首次运行 Playwright 时，如果本机没有 Chromium：
 
-Edit `src/config/seo.ts` file:
-
-```typescript
-export const siteConfig = {
-  title: "Enterprise Navigation Platform",
-  description: "Professional enterprise-level tools and resource navigation platform",
-  url: "https://your-domain.com",
-  // ... other configurations
-};
+```bash
+npx playwright install chromium
 ```
 
-### 🎨 Custom Styling
+单元测试使用 `tests/`，浏览器测试位于 `tests/e2e/`。E2E 测试会 stub `window.open`，不会真实打开企业外链或搜索引擎。
 
-The project uses Tailwind CSS for style management. You can:
+## SEO、PWA 与部署
 
-1. **Modify theme colors**: Edit `tailwind.config.cjs`
-2. **Add custom animations**: Add CSS `@keyframes` in components
-3. **Adjust responsive breakpoints**: Modify Tailwind configuration
+构建时 `src/config/sitePlugin.ts` 从 YAML 注入 title、description、canonical、Open Graph、Twitter 和 JSON-LD，并同步生成 `robots.txt`、`sitemap.xml` 与 `site.webmanifest`，避免站点名称、域名或描述出现多处配置。`public/` 只保留 Logo、应用图标和 OG 图片等真实静态资源。
 
-### 📱 Mobile Adaptation
+更新品牌文案后可执行 `npm run generate:og` 重新生成 1200×630 的社交分享图；该命令同样读取 `src/config/site.yaml`，不会维护第二份标题或描述。
 
-- Automatic device type detection
-- Mobile hamburger menu display
-- Touch-friendly interaction design
-- Optimized font sizes and spacing
+Vercel 使用仓库中的 `vercel.json`：
 
-### 🔧 Development Tools
+- 安装：`npm ci`
+- 构建：`npm run build`
+- 输出目录：`dist`
+- 框架：Vite
 
-- **ESLint**: Code quality checking
-- **Prettier**: Code formatting
-- **TypeScript**: Type safety
-- **Astro Check**: Astro-specific type checking
+站点正式地址为 <https://nav.elexvx.com/>。部署前请先完成全部质量门禁，并确认 YAML 中的外链和品牌资源仍然有效。
 
-### 📈 Performance Optimization
+## 许可证
 
-- Static Site Generation (SSG)
-- Automatic image optimization
-- CSS and JS code splitting
-- Critical resource preloading
-- Minimal runtime JavaScript
-
----
-
-## 📄 License
-
-MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📞 Support
-
-If you have any questions or need help, please create an issue in the repository.
+MIT License。
