@@ -178,7 +178,7 @@ export async function fetchStatusData(options: {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
-      signal: AbortSignal.timeout(options.timeoutMs ?? 8_000),
+      signal: AbortSignal.timeout(options.timeoutMs ?? 20_000),
     });
 
     if (!response.ok) throw new Error(`UptimeRobot 请求失败（${response.status}）`);
