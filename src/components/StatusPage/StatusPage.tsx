@@ -92,6 +92,7 @@ function MonitorRow({ monitor }: { monitor: StatusMonitor }) {
           </Typography.Text>
         </div>
       </div>
+      <AvailabilityStrip days={monitor.days} label={monitorDisplayName(monitor.name)} />
       <Typography.Text className={styles.monitorUptime} type="secondary">
         {formatPercent(monitor.percent)}
       </Typography.Text>

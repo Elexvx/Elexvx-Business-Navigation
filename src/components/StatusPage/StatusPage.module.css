@@ -182,7 +182,7 @@
   display: grid;
   min-height: 64px;
   align-items: center;
-  grid-template-columns: 1fr 80px 32px;
+  grid-template-columns: minmax(190px, 1fr) minmax(240px, 1.5fr) 80px 32px;
   gap: 12px;
   padding: 12px 14px;
   border-bottom: 1px solid var(--ant-color-border-secondary);
@@ -322,6 +322,7 @@
   }
 
   .groupLabel > .availabilityStrip,
+  .monitorRow > .availabilityStrip,
   .groupUptime {
     display: none;
   }

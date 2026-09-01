@@ -181,6 +181,7 @@ test('status page matches the compact desktop design and exposes working history
   await expect(page.getByText('项目服务', { exact: true })).toBeVisible();
   await expect(page.getByText('公共服务', { exact: true })).toBeVisible();
   await expect(page.getByText('企业官网', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('企业官网最近 60 天可用性')).toBeVisible();
 
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -204,6 +205,7 @@ test('status page keeps the mobile hierarchy compact without horizontal overflow
   await expect(page.getByText('企业服务', { exact: true })).toBeVisible();
   await expect(page.getByLabel('企业服务最近 60 天可用性')).toBeHidden();
   await expect(page.getByText('企业官网', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('企业官网最近 60 天可用性')).toBeHidden();
 
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
