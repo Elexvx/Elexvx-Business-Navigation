@@ -58,8 +58,8 @@ describe('status routing and aggregation', () => {
   });
 
   it('rewrites only status-domain entry routes to the dedicated status document', () => {
-    expect(resolveStatusDomainEntry(new URL('https://status.elexvx.com/'))).toBe('/status.html');
-    expect(resolveStatusDomainEntry(new URL('https://status.elexvx.com/history'))).toBe('/status.html');
+    expect(resolveStatusDomainEntry(new URL('https://status.elexvx.com/'))).toBe('/status');
+    expect(resolveStatusDomainEntry(new URL('https://status.elexvx.com/history'))).toBe('/status');
     expect(resolveStatusDomainEntry(new URL('https://nav.elexvx.com/'))).toBeUndefined();
     expect(resolveStatusDomainEntry(new URL('https://status.elexvx.com/api/status'))).toBeUndefined();
   });

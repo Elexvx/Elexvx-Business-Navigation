@@ -33,7 +33,7 @@
     }
   ],
   "rewrites": [
-    { "source": "/history", "destination": "/status.html" },
-    { "source": "/status/history", "destination": "/status.html" }
+    { "source": "/history", "destination": "/status" },
+    { "source": "/status/history", "destination": "/status" }
   ]
 }
